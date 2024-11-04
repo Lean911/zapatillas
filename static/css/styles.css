@@ -1,0 +1,13 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+.carousel-item {
+    height: 100vh; /* Ocupa todo el alto de la ventana */
+}
+
+.carousel-item img {
+    object-fit: cover; /* Asegura que la imagen cubra todo el contenedor sin distorsión */
+    height: 100vh;     /* Asegura que la imagen ocupe el alto completo del contenedor */
+}
