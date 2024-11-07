@@ -3,93 +3,71 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Cambia esto por una clave secreta
+app.secret_key = 'your_secret_key'
 
 # Configuración de la base de datos MySQL
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'root',  # Cambia esto por tu contraseña
-    'database': 'tuZapatos',
+    'password': '',
+    'database': 'tuZapatos',  # Asegúrate de usar tu nombre de base de datos
 }
 
 def get_db_connection():
     return mysql.connector.connect(**db_config)
 
-# Ruta para registrar usuarios
+# Registro de usuarios
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        is_admin = 1 if request.form.get('is_admin') else 0  # Si es admin, obtiene 1, si no, 0
+        is_admin = 1 if request.form.get('is_admin') else 0
 
-        hashed_password = generate_password_hash(password)  # Usar el hash por defecto para la contraseña
-
-        # Conexión a la base de datos y guardado del nuevo usuario
+        hashed_password = generate_password_hash(password)
         connection = get_db_connection()
         cursor = connection.cursor()
-
-        sql = "INSERT INTO users (userName, password, is_admin) VALUES (%s, %s, %s)"
+        sql = "INSERT INTO users (username, password, is_admin) VALUES (%s, %s, %s)"
         cursor.execute(sql, (username, hashed_password, is_admin))
         connection.commit()
-
         cursor.close()
         connection.close()
-
-        return redirect('/login')  # Redirige a la página de login después del registro
+        return redirect('/login')
     return render_template('registro.html')
 
-# Ruta para el login de usuarios
+# Login de usuarios
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        # Aquí obtienes el cursor y la conexión a la base de datos
-        connection = mysql.connector.connect(**db_config)
+        connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-
-        # Consulta para obtener el usuario
-        cursor.execute("SELECT * FROM users WHERE userName = %s", (username,))
-        user = cursor.fetchone()  # Obtén un solo usuario
-
-        # Verifica si se encontró el usuario
-        if user and check_password_hash(user['password'], password):  # Cambia user[1] por user['password']
-            session['user_id'] = user['id']  # Cambia user[0] por user['id'] según la columna de ID
-            session['username'] = user['username']  # Cambia user['userName'] por user['username']
-            session['is_admin'] = user['is_admin']  # user['is_admin']
-
-            if user['is_admin']:  # Si el usuario es admin
-                return redirect('/dashboard')  # Redirige al dashboard para administración
-            else:
-                return redirect('/user-dashboard')  # Redirige al dashboard de usuario regular
+        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
+        if user and check_password_hash(user['password'], password):
+            session['user_id'] = user['id']
+            session['username'] = user['username']
+            session['is_admin'] = user['is_admin']
+            return redirect('/dashboard') if user['is_admin'] else redirect('/user-dashboard')
         else:
-            flash("Nombre de usuario o contraseña incorrectos", "danger")  # Maneja el error de inicio de sesión
-
-        # Cierra el cursor y la conexión
+            flash("Nombre de usuario o contraseña incorrectos", "danger")
         cursor.close()
         connection.close()
-
     return render_template('login.html')
 
-
-# Ruta para el panel de administración
+# Panel de administración
 @app.route('/admin')
 def admin():
     if not session.get('is_admin'):
         return "Acceso denegado. Solo administradores."
     return render_template('admin.html')
 
-# Ruta para el dashboard de usuarios y para agregar productos
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
-    if not session.get('is_admin'):  # Solo permite el acceso a admin
-        return redirect('/login')  # Redirige al login si no es admin
-    
+    if not session.get('is_admin'):
+        return redirect('/login')
     if request.method == 'POST':
-        # Obtener datos del formulario
         nombre = request.form['nombre']
         descripcion = request.form['descripcion']
         precio = request.form['precio']
@@ -97,106 +75,111 @@ def dashboard():
         id_categoria = request.form['ID_Categoria']
         id_marca = request.form['id_marca']
         imagen = request.form['imagen']
-
-        # Conectar a la base de datos y agregar el producto
         conn = get_db_connection()
         cursor = conn.cursor()
-
-        # Consulta para insertar el nuevo producto
         query = '''
         INSERT INTO productos (Nombre, Descripcion, Precio, Stock, ID_Categoria, id_marca, Imagen)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         '''
         cursor.execute(query, (nombre, descripcion, precio, stock, id_categoria, id_marca, imagen))
-        conn.commit()  # Guardar los cambios
-
+        conn.commit()
         cursor.close()
         conn.close()
-
         return redirect(url_for('dashboard'))
-
-    # Obtener los productos existentes para mostrarlos
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-
-    # Obtener productos
-    cursor.execute('SELECT * FROM productos')
+    query = '''
+    SELECT productos.*, categorias.Nombre AS Categoria
+    FROM productos
+    JOIN categorias ON productos.ID_Categoria = categorias.ID_Categoria
+    '''
+    cursor.execute(query)
     productos = cursor.fetchall()
 
-    # Obtener categorías
     cursor.execute('SELECT * FROM categorias')
     categorias = cursor.fetchall()
-
-    # Obtener marcas
     cursor.execute('SELECT * FROM marcas')
     marcas = cursor.fetchall()
 
-    # Cerrar cursor y conexión
     cursor.close()
     conn.close()
-
     return render_template('dashboard.html', productos=productos, categorias=categorias, marcas=marcas)
 
-# Rutas para productos por categoría (Hombre, Mujer, Niño, Niña)
-@app.route('/productos/hombre')
-def productos_hombre():
+# Productos por categoría
+@app.route('/productos/<categoria>')
+def productos_categoria(categoria):
+    categorias_ids = {'Hombre': 1, 'Mujer': 2, 'Niño': 3, 'Niña': 4}
+    if categoria not in categorias_ids:
+        return "Categoría no encontrada."
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-
     query = "SELECT * FROM productos WHERE ID_Categoria = %s"
-    cursor.execute(query, (1,))  # ID 1 es 'hombre'
-
-    productos = cursor.fetchall()  # Lee todos los resultados aquí
-
-    cursor.close()  # Luego puedes cerrar el cursor
-    conn.close()  # Cerrar la conexión después de leer los resultados
-
-    return render_template('hombre.html', productos=productos)
-
-@app.route('/productos/mujer')
-def productos_mujer():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    query = "SELECT * FROM productos WHERE ID_Categoria = %s"
-    cursor.execute(query, (2,))  # ID 2 es 'mujer'
-
+    cursor.execute(query, (categorias_ids[categoria],))
     productos = cursor.fetchall()
-
     cursor.close()
     conn.close()
+    return render_template(f'{categoria}.html', productos=productos)
 
-    return render_template('mujer.html', productos=productos)
-
-@app.route('/productos/nino')
-def productos_nino():
+@app.route('/add_to_favorites/<int:producto_id>', methods=['POST'])
+def add_to_favorites(producto_id):
+    if 'user_id' not in session:
+        flash("Por favor, inicia sesión para agregar a favoritos.", "warning")
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    query = "SELECT * FROM productos WHERE ID_Categoria = %s"
-    cursor.execute(query, (3,))  # ID 3 es 'niño'
-
-    productos = cursor.fetchall()
-
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM favoritos WHERE user_id = %s AND producto_id = %s", (user_id, producto_id))
+    favorito = cursor.fetchone()
+    
+    if not favorito:
+        cursor.execute("INSERT INTO favoritos (user_id, producto_id) VALUES (%s, %s)", (user_id, producto_id))
+        conn.commit()
+        flash("Producto agregado a favoritos.", "success")
+    else:
+        flash("Este producto ya está en tus favoritos.", "info")
+    
     cursor.close()
     conn.close()
+    return redirect(url_for('productos_categoria', categoria='todos'))
 
-    return render_template('nino.html', productos=productos)
-
-@app.route('/productos/nina')
-def productos_nina():
+@app.route('/eliminar_producto/<int:producto_id>', methods=['POST'])
+def eliminar_producto(producto_id):
+    if not session.get('is_admin'):
+        return redirect(url_for('login'))
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    query = "SELECT * FROM productos WHERE ID_Categoria = %s"
-    cursor.execute(query, (4,))  # ID 4 es 'niña'
-
-    productos = cursor.fetchall()
-
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM productos WHERE ID = %s', (producto_id,))
+    conn.commit()
     cursor.close()
     conn.close()
+    flash("Producto eliminado.", "success")
+    return redirect(url_for('dashboard'))
 
-    return render_template('niña.html', productos=productos)
+@app.route('/favoritos')
+def favoritos():
+    if 'user_id' not in session:
+        flash("Por favor, inicia sesión para ver tus favoritos.", "warning")
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    query = '''
+    SELECT productos.* 
+    FROM productos
+    JOIN favoritos ON productos.ID = favoritos.producto_id
+    WHERE favoritos.user_id = %s
+    '''
+    cursor.execute(query, (user_id,))
+    favoritos = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+    return render_template('favoritos.html', favoritos=favoritos)
 
 @app.route('/logout')
 def logout():
@@ -205,7 +188,15 @@ def logout():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM productos WHERE esDeTemporada = 1")
+    temporada_productos = cursor.fetchall()
+    cursor.execute("SELECT * FROM productos WHERE esDeTemporada = 0")
+    productos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('index.html', productos=productos, temporada_productos=temporada_productos)
 
 if __name__ == '__main__':
     app.run(debug=True)

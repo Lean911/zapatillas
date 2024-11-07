@@ -11,3 +11,66 @@
     object-fit: cover; /* Asegura que la imagen cubra todo el contenedor sin distorsión */
     height: 100vh;     /* Asegura que la imagen ocupe el alto completo del contenedor */
 }
+
+
+
+.product-section {
+    background-color: #ffe6e6; /* Fondo rosa claro */
+    padding: 20px 0;
+}
+
+.container {
+    max-width: 95%; /* Ajuste del ancho máximo del contenedor */
+}
+
+.product-card {
+    border: none; /* Sin borde para la tarjeta */
+    background-color: transparent; /* Fondo transparente */
+}
+
+.product-card img {
+    border-radius: 8px;
+    max-height: 200px; /* Tamaño máximo para la imagen */
+    object-fit: cover;
+}
+
+.product-card .card-title {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.product-card .card-text {
+    font-size: 0.9em;
+    color: #555;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+
+<style>
+    .form-check-input:checked {
+        background-color: #28a745; /* Color verde cuando esté marcado */
+        border-color: #28a745; /* Bordes verdes cuando esté marcado */
+    }
+
+    .form-check-input {
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .form-check-label {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .form-check-input:focus {
+        border-color: #80bdff;
+        outline: none;
+    }
+</style>

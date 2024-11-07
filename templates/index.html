@@ -7,5 +7,61 @@ Inicio | Almacen de Calzado
 {% block content %}
 <h1>Bienvenido a Almacen de Calzado</h1>
 <p>Encuentra los mejores productos aquí.</p>
-<h1>index</h1>
+
+<!-- Sección de Productos de Temporada -->
+<section id="temporada" class="container mt-4">
+    <h2 class="text-center mb-4">Productos de la Temporada</h2>
+    <div id="carouselTemporada" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+        <div class="carousel-inner">
+            {% for producto in temporada_productos %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-4 text-center">
+                            <div class="card">
+                                <img src="{{ url_for('static', filename='img/' + producto.Imagen) }}" class="card-img-top" alt="{{ producto.Nombre }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ producto.Nombre }}</h5>
+                                    <p class="card-text">Precio: ${{ producto.Precio }}</p>
+                                    <a href="#" class="btn btn-primary">Comprar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselTemporada" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselTemporada" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</section>
+
+<!-- Sección de Productos por Categoría -->
+<section id="productos" class="container mt-4">
+    <h2 class="text-center mb-4">Todos los Productos</h2>
+    <div class="row">
+        {% for producto in productos %}
+            <div class="col-12 col-md-6 col-lg-3 mb-4">
+                <div class="card product-card">
+                    <img src="{{ url_for('static', filename='img/' + producto.Imagen) }}" alt="{{ producto.Nombre }}" class="card-img-top">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ producto.Nombre }}</h5>
+                        <p class="card-text">{{ producto.Descripcion }}</p>
+                        <p class="card-text">Precio: ${{ producto.Precio }}</p>
+                        <button onclick="toggleFavorito('{{ producto.ID }}')" class="btn btn-outline-danger">
+                            Favorito
+                        </button>
+                        <a href="#" class="btn btn-primary">Comprar</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
 {% endblock %}
