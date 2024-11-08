@@ -20,7 +20,10 @@ Inicio | Almacen de Calzado
                         <h5 class="card-title">{{ producto['Nombre'] }}</h5>
                         <p class="card-text">{{ producto['Descripcion'] }}</p>
                         <p class="card-text"><strong>Precio:</strong> ${{ producto['Precio'] }}</p>
-                        <a href="#" class="btn btn-primary">Comprar</a>
+                        <form action="{{ url_for('agregar_al_carrito', producto_id=producto.ID_Producto) }}" method="post">
+                            <button type="submit" class="btn btn-primary">Comprar</button>
+                        </form>
+                        
                     </div>
                 </div>
             </div>

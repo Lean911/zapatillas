@@ -193,6 +193,52 @@ def favoritos():
     conn.close()
     return render_template('favoritos.html', favoritos=favoritos)
 
+# Inicializar el carrito
+@app.before_request
+def init_cart():
+    if 'carrito' not in session:
+        session['carrito'] = []
+
+from flask import session
+
+# Función para agregar al carrito
+@app.route('/agregar_al_carrito/<int:producto_id>', methods=['POST'])
+def agregar_al_carrito(producto_id):
+    # Obtener la cantidad deseada del formulario o definir una cantidad por defecto
+    cantidad = int(request.form.get('cantidad', 1))
+
+    # Si no hay un carrito en la sesión, inicializarlo como una lista vacía
+    if 'carrito' not in session:
+        session['carrito'] = []
+
+    # Conectar a la base de datos para obtener el producto y sus detalles
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM productos WHERE ID_Producto = %s", (producto_id,))
+    producto = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    # Agregar el producto con sus detalles y cantidad al carrito
+    if producto:
+        item = {
+            'id': producto['ID_Producto'],
+            'nombre': producto['Nombre'],
+            'descripcion': producto['Descripcion'],
+            'precio': producto['Precio'],
+            'cantidad': cantidad
+        }
+        session['carrito'].append(item)
+        session.modified = True  # Asegura que los cambios en la sesión se guarden
+
+    return redirect(url_for('ver_carrito'))
+
+@app.route('/ver_carrito')
+def ver_carrito():
+    # Verificar el contenido del carrito
+    print("Contenido del carrito:", session.get('carrito'))
+    carrito = session.get('carrito', [])
+    return render_template('carrito.html', carrito=carrito)
 
 @app.route('/')
 def index():

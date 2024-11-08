@@ -1,22 +1,34 @@
+/* Reset global */
 * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
 
+/* Body */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f9;
+    margin: 0;  /* Elimina el margen predeterminado del body */
 }
 
 /* Navbar */
 .navbar {
-    background-color: #007bff;
-    padding: 15px;
+    background-color: #007bff;  /* Fondo azul */
+    padding: 15px 30px;  /* Padding lateral */
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    position: fixed;  /* Fija el navbar en la parte superior */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;  /* Asegura que esté por encima de otros elementos */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Sombra sutil */
+    margin: 0;  /* Elimina márgenes */
 }
 
+/* Para el texto del navbar */
 .navbar .project-name {
     font-size: 24px;
     font-weight: bold;
@@ -27,14 +39,14 @@ body {
 .navbar .welcome-message {
     font-size: 22px;
     font-weight: bold;
-    color: #f0f0f0;
-    margin-left: auto;
+    color: white;
     font-style: italic;
+    margin-left: auto;
 }
 
 /* Main container */
 .main-container {
-    padding: 80px 20px 20px;
+    padding: 80px 20px 20px;  /* Ajusta el padding para no tapar el contenido por el navbar fijo */
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -165,11 +177,8 @@ body {
 .btn-danger:hover {
     background-color: #c82333;
 }
-#temporada {
-    display: block !important;
-}
 
-
+/* Carousel */
 #temporadaCarousel .carousel-item {
     display: flex;
     justify-content: center;
@@ -190,53 +199,38 @@ body {
     background-color: #000; /* Color de los controles del carrusel */
 }
 
+/* Navbar responsive */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;  /* Acomoda los elementos verticalmente */
+        text-align: center;
+    }
 
-body {
-    background-color: #f0f2f5;
-    font-family: 'Arial', sans-serif;
-    padding-top: 90px; /* Espacio para el navbar fijo */
-}
-.navbar {
-    background-color: #ffffff;
-    padding: 15px 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    border: 1px solid #ddd; /* Contorno para el navbar */
-}
-/* Estilo para los enlaces del navbar */
-.navbar-nav .nav-link {
-    font-size: 18px;  /* Tamaño de letra grande */
-    color: #333;      /* Color inicial */
-    transition: all 0.3s ease;  /* Suaviza la transición */
-}
+    .navbar .project-name {
+        margin-bottom: 10px;  /* Espacio entre los elementos */
+    }
 
-/* Efecto de hover en los enlaces */
-.navbar-nav .nav-link:hover {
-    font-size: 20px;  /* Agranda la letra al pasar el mouse */
-    color: #FFD700;   /* Color dorado */
+    .navbar-logo {
+        display: none;
+    }
+
+    .footer-logo {
+        display: inline-block;
+        text-align: center;
+        margin-top: 15px;
+    }
 }
 
-.carousel-inner img {
-    width: 100%;
-    height: auto;
-}
+/* Estilo para el logo */
 .navbar-logo {
     height: 80px;
     width: auto;
 }
-/* Ocultar el logo en pantallas pequeñas */
-.navbar-logo {
-    display: inline-block;
-}
-@media (max-width: 768px) {
-    .navbar-logo {
-        display: none;
-    }
-    .footer-logo {
-        display: inline-block;
-    }
-}
-.footer-logo {
-    display: none;
+
+/* Estilos adicionales */
+footer {
     text-align: center;
-    margin-top: 15px;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
 }
