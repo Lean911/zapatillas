@@ -141,11 +141,14 @@
         </div>
     </div>
 
-    <hr>
+   
 <!-- Este es el código común para todas las páginas de productos -->
 
 <hr>
-
+<div class="container mt-4">
+    {% block content %}
+    {% endblock %}
+</div>
 <div class="container mt-4">
     <div class="row">
         {% for producto in productos %}
@@ -177,8 +180,8 @@
     </div>
 </div>
 
-<hr>
 
+<hr>
 
     <!-- Footer con el logo en móviles -->
     <footer class="text-center mt-4">

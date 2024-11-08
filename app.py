@@ -121,7 +121,7 @@ def dashboard():
 # Productos por categoría
 @app.route('/productos/<categoria>')
 def productos_categoria(categoria):
-    categorias_ids = {'Hombre': 1, 'Mujer': 2, 'Niño': 3, 'Niña': 4}
+    categorias_ids = {'Hombre': 1, 'Mujer': 2, 'Nino': 3, 'Niña': 4}
     if categoria not in categorias_ids:
         return "Categoría no encontrada."
     conn = get_db_connection()
@@ -201,17 +201,17 @@ def init_cart():
 
 from flask import session
 
-# Función para agregar al carrito
+
 @app.route('/agregar_al_carrito/<int:producto_id>', methods=['POST'])
 def agregar_al_carrito(producto_id):
-    # Obtener la cantidad deseada del formulario o definir una cantidad por defecto
+    
     cantidad = int(request.form.get('cantidad', 1))
 
-    # Si no hay un carrito en la sesión, inicializarlo como una lista vacía
+    
     if 'carrito' not in session:
         session['carrito'] = []
 
-    # Conectar a la base de datos para obtener el producto y sus detalles
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM productos WHERE ID_Producto = %s", (producto_id,))
@@ -219,7 +219,7 @@ def agregar_al_carrito(producto_id):
     cursor.close()
     conn.close()
 
-    # Agregar el producto con sus detalles y cantidad al carrito
+    
     if producto:
         item = {
             'id': producto['ID_Producto'],
@@ -229,48 +229,82 @@ def agregar_al_carrito(producto_id):
             'cantidad': cantidad
         }
         session['carrito'].append(item)
-        session.modified = True  # Asegura que los cambios en la sesión se guarden
+        session.modified = True  
 
     return redirect(url_for('ver_carrito'))
 
 @app.route('/ver_carrito')
 def ver_carrito():
-    # Verificar el contenido del carrito
+    
     print("Contenido del carrito:", session.get('carrito'))
     carrito = session.get('carrito', [])
     return render_template('carrito.html', carrito=carrito)
 
 @app.route('/')
 def index():
+    
+    connection = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='',
+        database='tuzapatos'
+    )
+    cursor = connection.cursor()
+    
+    
+    cursor.execute("SELECT * FROM productos WHERE esDeTemporada = 1")
+    productos = cursor.fetchall()  
+    
+    
+    temporada_productos = []
+    for producto in productos:
+        producto_dict = {
+            'ID_Producto': producto[0],  
+            'Nombre': producto[1],
+            'Precio': producto[2],
+            'Descripcion': producto[3],
+            'Imagen': producto[4],  
+            
+        }
+        temporada_productos.append(producto_dict)
+    print(temporada_productos)  
+
+    connection.close()
+    return render_template('index.html', temporada_productos=temporada_productos)
+
+
+@app.route('/hombre')
+def categoria_hombre():
     # Crear una conexión a la base de datos
     connection = mysql.connector.connect(
         host='localhost',
         user='root',
         password='',
-        database='tuZapatos'
+        database='tuzapatos'
     )
     cursor = connection.cursor()
-    
-    # Consulta para obtener productos de temporada
-    cursor.execute("SELECT * FROM productos WHERE esDeTemporada = 1")
-    temporada_productos = cursor.fetchall()
-    
-    # Imprimir los productos de temporada para depuración
-    print(temporada_productos)  # Esto imprimirá la lista de productos
-    
-    connection.close()
-    
-    # Pasar los productos al template
-    return render_template('index.html', temporada_productos=temporada_productos)
+    cursor.execute("SELECT * FROM productos WHERE categoria = 'Hombre' AND esDeTemporada = 0")
+    productos_hombre = cursor.fetchall()  
+   
+    productos_hombre_dict = []
+    for producto in productos_hombre:
+        producto_dict = {
+            'ID_Producto': producto[0],
+            'Nombre': producto[1],
+            'Precio': producto[2],
+            'Descripcion': producto[3],
+            'Imagen': producto[4],
+            'Temporada': producto[5],  
+            'Categoria': producto[6],  
+        }
+        productos_hombre_dict.append(producto_dict)
 
-@app.route('/productos/hombre')
-def productos_hombre():
-    connection = mysql.connect()
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM productos WHERE categoria = 'Hombre'")  # Ajusta la consulta según tu esquema
-    productos_hombre = cursor.fetchall()
+    
     connection.close()
-    return render_template('hombre.html', productos=productos_hombre)
+
+    # Pasar los productos al template
+    return render_template('categoria_hombre.html', productos=productos_hombre_dict)
+
 
 
 
