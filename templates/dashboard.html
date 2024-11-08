@@ -3,93 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Dashboard - Admin</title>
-    <style>
-        /* Styles */
-        body { font-family: 'Arial', sans-serif; background-color: #f4f4f9; }
-        .navbar { background-color: #007bff; padding: 15px; }
-        .navbar .project-name { font-size: 24px; font-weight: bold; color: white; text-decoration: none; }
-        .navbar .welcome-message { font-size: 18px; margin-left: auto; }
-        .main-container { padding: 80px 20px 20px; max-width: 1200px; margin: 0 auto; }
-
-        /* Styles for adding products */
-        .crud-content, .crud-table {
-            background-color: #ffffff; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-            margin-bottom: 20px; 
-        }
-
-        .formulario-producto { display: flex; flex-direction: column; gap: 10px; }
-        .formulario-producto input, 
-        .formulario-producto textarea, 
-        .formulario-producto select {
-            padding: 10px; 
-            border-radius: 6px; 
-            border: 1px solid #ccc; 
-            transition: border-color 0.3s; 
-        }
-
-        .formulario-producto input:focus, 
-        .formulario-producto textarea:focus, 
-        .formulario-producto select:focus {
-            border-color: #007bff; 
-            outline: none; 
-        }
-
-        .btn-agregar { background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        .btn-agregar:hover { background-color: #0056b3; }
-
-        /* Styles for product table */
-        .tabla-productos table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .tabla-productos th, .tabla-productos td {
-            padding: 10px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-
-        .tabla-productos th {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn-editar, .btn-eliminar {
-            background-color: #28a745; /* Green for edit */
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer;
-            padding: 5px 10px; /* Adjust padding */
-            margin-right: 5px; /* Spacing between buttons */
-        }
-
-        .btn-eliminar {
-            background-color: #dc3545; /* Red for delete */
-        }
-
-        .btn-editar:hover { background-color: #218838; }
-        .btn-eliminar:hover { background-color: #c82333; }
-
-        #logout-button { margin-left: 20px; }
-    </style>
 </head>
 <body>
     <!-- Navbar -->
     <header>
         <nav class="navbar">
-            <a href="#" class="project-name">ZapaManía</a>
-            <a href="{{ url_for('logout') }}" class="btn btn-danger">Cerrar Sesión</a>
+            <a href="#" class="project-name">Almacen de Calzado - Administración</a>
             <span class="welcome-message">Bienvenido, {{ session['username'] if session['is_admin'] else 'admin' }}</span>
         </nav>
     </header>
-
+    
     <!-- Main Container -->
     <main class="main-container">
         <div class="crud-header">
@@ -103,7 +29,7 @@
                 <textarea name="descripcion" placeholder="Descripción" required></textarea>
                 <input type="number" step="0.01" name="precio" placeholder="Precio" required>
                 <input type="number" name="stock" placeholder="Stock" required>
-
+            
                 <!-- Category Dropdown -->
                 <select name="ID_Categoria" required>
                     <option value="" disabled selected>Selecciona la Categoría</option>
@@ -111,7 +37,7 @@
                         <option value="{{ categoria.ID_Categoria }}">{{ categoria.Nombre }}</option>
                     {% endfor %}
                 </select>
-
+            
                 <!-- Brand Dropdown (id_marca) -->
                 <select name="id_marca" required>
                     <option value="" disabled selected>Selecciona la Marca</option>
@@ -119,18 +45,15 @@
                     <option value="2">Adidas</option>
                     <option value="3">Toppers</option>
                 </select>
-
+            
                 <input type="text" name="imagen" placeholder="URL de la Imagen" required>
-
-                {% for producto in productos %}
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="esDeTemporada" {% if producto.EsDeTemporada %}checked{% endif %}>
-                        <label class="form-check-label" for="esDeTemporada">Es de Temporada</label>
-                    </div>
-                {% endfor %}
-
-                
-
+            
+                <!-- Mostrar el checkbox de "Es de Temporada" una sola vez -->
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="esDeTemporada" name="esDeTemporada">
+                    <label class="form-check-label" for="esDeTemporada">Es de Temporada</label>
+                </div>
+            
                 <button type="submit" class="btn-agregar">Agregar Producto</button>
             </form>
         </div>
@@ -171,28 +94,38 @@
             </div>
         </div>
 
-        <button onclick="window.location.href='/'" class="btn btn-primary">
-            Ir a la página principal
-        </button>
+        <div class="button-container">
+            <!-- Botón para volver a la página principal -->
+            <button onclick="window.location.href='/'" class="btn btn-primary">
+                Ir a la página principal
+            </button>
         
+            <!-- Botón para cerrar sesión -->
+            <button onclick="window.location.href='{{ logout_url }}'" class="btn btn-danger">
+                Cerrar Sesión
+            </button>
+        </div>        
     </main>
 
     <script>
         // Form validation script
-        document.getElementById('add-product-form').addEventListener('submit', function(event) {
-            const inputs = this.querySelectorAll('input, textarea, select');
-            let allFilled = true;
-
-            inputs.forEach(input => {
-                if (!input.value) {
-                    allFilled = false;
-                }
-            });
-
-            if (!allFilled) {
-                event.preventDefault();
-                alert('Debes completar todos los campos necesarios.');
+        document.getElementById('esDeTemporada').addEventListener('change', function() {
+            const categoryDropdown = document.querySelector('select[name="ID_Categoria"]');
+                if (this.checked) {
+                // Asignamos un valor predeterminado para los productos de temporada
+            categoryDropdown.value = "5";  // Suponiendo que 5 es la categoría de "temporada"
+            categoryDropdown.setAttribute("disabled", "disabled"); // Lo deshabilitamos para que no pueda seleccionarse
+                } else {
+                // Cuando "Es de Temporada" no está marcado, habilitamos el dropdown
+            categoryDropdown.removeAttribute("disabled");
+            categoryDropdown.value = "";  // O cualquier valor por defecto
             }
+        });
+
+
+        document.getElementById('esDeTemporada').addEventListener('change', function() {
+            const categoryDropdown = document.querySelector('select[name="ID_Categoria"]');
+            categoryDropdown.disabled = this.checked;
         });
     </script>
 </body>

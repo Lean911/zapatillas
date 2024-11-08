@@ -49,7 +49,7 @@ def login():
             session['user_id'] = user['id']
             session['username'] = user['username']
             session['is_admin'] = user['is_admin']
-            return redirect('/dashboard') if user['is_admin'] else redirect('/user-dashboard')
+            return redirect('/dashboard') if user['is_admin'] else redirect('/dashboard')
         else:
             flash("Nombre de usuario o contraseña incorrectos", "danger")
         cursor.close()
@@ -67,25 +67,37 @@ def admin():
 def dashboard():
     if not session.get('is_admin'):
         return redirect('/login')
+    
     if request.method == 'POST':
+        # Obtener los datos del formulario
         nombre = request.form['nombre']
         descripcion = request.form['descripcion']
         precio = request.form['precio']
         stock = request.form['stock']
-        id_categoria = request.form['ID_Categoria']
+        # Comprobar si el producto es de temporada
+        id_categoria = request.form['ID_Categoria'] if not request.form.get('esDeTemporada') else "5"  # 5 es la categoría de temporada
         id_marca = request.form['id_marca']
         imagen = request.form['imagen']
+        es_de_temporada = request.form.get('esDeTemporada') == 'on'  # Verifica si el checkbox está marcado
+
+        # Conectar a la base de datos
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # SQL para insertar el producto
         query = '''
-        INSERT INTO productos (Nombre, Descripcion, Precio, Stock, ID_Categoria, id_marca, Imagen)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO productos (Nombre, Descripcion, Precio, Stock, ID_Categoria, id_marca, Imagen, esDeTemporada)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         '''
-        cursor.execute(query, (nombre, descripcion, precio, stock, id_categoria, id_marca, imagen))
+        cursor.execute(query, (nombre, descripcion, precio, stock, id_categoria, id_marca, imagen, es_de_temporada))
         conn.commit()
+
+        # Cerrar la conexión
         cursor.close()
         conn.close()
+
         return redirect(url_for('dashboard'))
+
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -181,22 +193,45 @@ def favoritos():
     conn.close()
     return render_template('favoritos.html', favoritos=favoritos)
 
+
+@app.route('/')
+def index():
+    # Crear una conexión a la base de datos
+    connection = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='',
+        database='tuZapatos'
+    )
+    cursor = connection.cursor()
+    
+    # Consulta para obtener productos de temporada
+    cursor.execute("SELECT * FROM productos WHERE esDeTemporada = 1")
+    temporada_productos = cursor.fetchall()
+    
+    # Imprimir los productos de temporada para depuración
+    print(temporada_productos)  # Esto imprimirá la lista de productos
+    
+    connection.close()
+    
+    # Pasar los productos al template
+    return render_template('index.html', temporada_productos=temporada_productos)
+
+@app.route('/productos/hombre')
+def productos_hombre():
+    connection = mysql.connect()
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM productos WHERE categoria = 'Hombre'")  # Ajusta la consulta según tu esquema
+    productos_hombre = cursor.fetchall()
+    connection.close()
+    return render_template('hombre.html', productos=productos_hombre)
+
+
+
+
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
-
-@app.route('/')
-def index():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM productos WHERE esDeTemporada = 1")
-    temporada_productos = cursor.fetchall()
-    cursor.execute("SELECT * FROM productos WHERE esDeTemporada = 0")
-    productos = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return render_template('index.html', productos=productos, temporada_productos=temporada_productos)
-
 if __name__ == '__main__':
     app.run(debug=True)

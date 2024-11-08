@@ -1,51 +1,154 @@
-*{
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
-.carousel-item {
-    height: 100vh; /* Ocupa todo el alto de la ventana */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
 }
 
-.carousel-item img {
-    object-fit: cover; /* Asegura que la imagen cubra todo el contenedor sin distorsión */
-    height: 100vh;     /* Asegura que la imagen ocupe el alto completo del contenedor */
+/* Navbar */
+.navbar {
+    background-color: #007bff;
+    padding: 15px;
+    display: flex;
+    align-items: center;
 }
 
-
-
-.product-section {
-    background-color: #ffe6e6; /* Fondo rosa claro */
-    padding: 20px 0;
-}
-
-.container {
-    max-width: 95%; /* Ajuste del ancho máximo del contenedor */
-}
-
-.product-card {
-    border: none; /* Sin borde para la tarjeta */
-    background-color: transparent; /* Fondo transparente */
-}
-
-.product-card img {
-    border-radius: 8px;
-    max-height: 200px; /* Tamaño máximo para la imagen */
-    object-fit: cover;
-}
-
-.product-card .card-title {
-    font-size: 1.1em;
+.navbar .project-name {
+    font-size: 24px;
     font-weight: bold;
+    color: white;
+    text-decoration: none;
 }
 
-.product-card .card-text {
-    font-size: 0.9em;
-    color: #555;
+.navbar .welcome-message {
+    font-size: 22px;
+    font-weight: bold;
+    color: #f0f0f0;
+    margin-left: auto;
+    font-style: italic;
+}
+
+/* Main container */
+.main-container {
+    padding: 80px 20px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* CRUD form and content */
+.crud-header h2 {
+    font-size: 2em;
+    color: #333;
+}
+
+.crud-content, .crud-table {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.formulario-producto {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.formulario-producto input,
+.formulario-producto textarea,
+.formulario-producto select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s;
+}
+
+.formulario-producto input:focus,
+.formulario-producto textarea:focus,
+.formulario-producto select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.btn-agregar {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-agregar:hover {
+    background-color: #0056b3;
+}
+
+/* Product Table */
+.tabla-productos table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-productos th,
+.tabla-productos td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.tabla-productos th {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-editar,
+.btn-eliminar {
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-editar {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-editar:hover {
+    background-color: #218838;
+}
+
+.btn-eliminar {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-eliminar:hover {
+    background-color: #c82333;
+}
+
+/* Button container */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 48%;
 }
 
 .btn-primary {
     background-color: #007bff;
+    color: white;
     border: none;
 }
 
@@ -53,24 +156,87 @@
     background-color: #0056b3;
 }
 
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
 
-<style>
-    .form-check-input:checked {
-        background-color: #28a745; /* Color verde cuando esté marcado */
-        border-color: #28a745; /* Bordes verdes cuando esté marcado */
-    }
+.btn-danger:hover {
+    background-color: #c82333;
+}
+#temporada {
+    display: block !important;
+}
 
-    .form-check-input {
-        transition: background-color 0.3s ease, border-color 0.3s ease;
-    }
 
-    .form-check-label {
-        font-weight: bold;
-        color: #555;
-    }
+#temporadaCarousel .carousel-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px; /* Ajusta la altura según tus necesidades */
+    background-color: #f8f9fa; /* Fondo ligero */
+}
 
-    .form-check-input:focus {
-        border-color: #80bdff;
-        outline: none;
+#temporadaCarousel .carousel-caption {
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro con opacidad */
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#temporadaCarousel .carousel-control-prev-icon,
+#temporadaCarousel .carousel-control-next-icon {
+    background-color: #000; /* Color de los controles del carrusel */
+}
+
+
+body {
+    background-color: #f0f2f5;
+    font-family: 'Arial', sans-serif;
+    padding-top: 90px; /* Espacio para el navbar fijo */
+}
+.navbar {
+    background-color: #ffffff;
+    padding: 15px 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ddd; /* Contorno para el navbar */
+}
+/* Estilo para los enlaces del navbar */
+.navbar-nav .nav-link {
+    font-size: 18px;  /* Tamaño de letra grande */
+    color: #333;      /* Color inicial */
+    transition: all 0.3s ease;  /* Suaviza la transición */
+}
+
+/* Efecto de hover en los enlaces */
+.navbar-nav .nav-link:hover {
+    font-size: 20px;  /* Agranda la letra al pasar el mouse */
+    color: #FFD700;   /* Color dorado */
+}
+
+.carousel-inner img {
+    width: 100%;
+    height: auto;
+}
+.navbar-logo {
+    height: 80px;
+    width: auto;
+}
+/* Ocultar el logo en pantallas pequeñas */
+.navbar-logo {
+    display: inline-block;
+}
+@media (max-width: 768px) {
+    .navbar-logo {
+        display: none;
     }
-</style>
+    .footer-logo {
+        display: inline-block;
+    }
+}
+.footer-logo {
+    display: none;
+    text-align: center;
+    margin-top: 15px;
+}

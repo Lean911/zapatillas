@@ -1,30 +1,28 @@
 {% extends "base.html" %}
 
 {% block title %}
-Inicio | Almacen de Calzado
+Calzados - Hombre | Almacen de Calzado
 {% endblock %}
 
 {% block content %}
 <h1>Calzados - H O M B R E</h1>
 <p>Encuentra los mejores productos aquí.</p>
-<h1>Hombre</h1>
-{% endblock %}
-{% block carrusel_productos %}
-    {% for producto in productos %}
-        <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="{{ producto['Imagen'] }}" class="card-img-top" alt="{{ producto['Nombre'] }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ producto['Nombre'] }}</h5>
-                            <p class="card-text">{{ producto['Descripcion'] }}</p>
-                            <p class="card-text"><strong>Precio:</strong> ${{ producto['Precio'] }}</p>
-                            <a href="#" class="btn btn-primary">Comprar</a>
-                        </div>
+
+<div class="container mt-4">
+    <div class="row">
+        {% for producto in productos %}
+            <div class="col-12 col-md-4 mb-4">
+                <div class="card">
+                    <img src="{{ url_for('static', filename='img/' + producto[2]) }}" class="card-img-top" alt="{{ producto[1] }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto[1] }}</h5>
+                        <p class="card-text">{{ producto[3] }}</p> <!-- Asumiendo que la descripción está en el índice 3 -->
+                        <p class="card-text"><strong>Precio:</strong> ${{ producto[4] }}</p> <!-- Asumiendo que el precio está en el índice 4 -->
+                        <a href="#" class="btn btn-primary">Comprar</a>
                     </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
