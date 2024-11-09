@@ -9,26 +9,26 @@
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f9;
-    margin: 0;  /* Elimina el margen predeterminado del body */
 }
 
 /* Navbar */
 .navbar {
-    background-color: #007bff;  /* Fondo azul */
-    padding: 15px 30px;  /* Padding lateral */
+    background-color: #ffffff;
+    padding: 15px 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: fixed;  /* Fija el navbar en la parte superior */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1000;  /* Asegura que esté por encima de otros elementos */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Sombra sutil */
-    margin: 0;  /* Elimina márgenes */
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 0;
+    font-size: 20px;
+    font-style: initial;
 }
 
-/* Para el texto del navbar */
 .navbar .project-name {
     font-size: 24px;
     font-weight: bold;
@@ -44,27 +44,38 @@ body {
     margin-left: auto;
 }
 
+.navbar-logo {
+    height: 80px;
+    width: auto;
+}
+
+/* Responsive Navbar */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        text-align: center;
+    }
+    .navbar .project-name {
+        margin-bottom: 10px;
+    }
+    .navbar-logo {
+        display: none;
+    }
+    .footer-logo {
+        display: inline-block;
+        text-align: center;
+        margin-top: 15px;
+    }
+}
+
 /* Main container */
 .main-container {
-    padding: 80px 20px 20px;  /* Ajusta el padding para no tapar el contenido por el navbar fijo */
+    padding: 80px 20px 20px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* CRUD form and content */
-.crud-header h2 {
-    font-size: 2em;
-    color: #333;
-}
-
-.crud-content, .crud-table {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
+/* Forms */
 .formulario-producto {
     display: flex;
     flex-direction: column;
@@ -87,62 +98,7 @@ body {
     outline: none;
 }
 
-.btn-agregar {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.btn-agregar:hover {
-    background-color: #0056b3;
-}
-
-/* Product Table */
-.tabla-productos table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.tabla-productos th,
-.tabla-productos td {
-    padding: 10px;
-    border: 1px solid #ccc;
-    text-align: left;
-}
-
-.tabla-productos th {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-editar,
-.btn-eliminar {
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.btn-editar {
-    background-color: #28a745;
-    color: white;
-}
-
-.btn-editar:hover {
-    background-color: #218838;
-}
-
-.btn-eliminar {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn-eliminar:hover {
-    background-color: #c82333;
-}
-
-/* Button container */
+/* CRUD Buttons */
 .button-container {
     display: flex;
     justify-content: space-between;
@@ -178,59 +134,187 @@ body {
     background-color: #c82333;
 }
 
-/* Carousel */
-#temporadaCarousel .carousel-item {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 400px; /* Ajusta la altura según tus necesidades */
-    background-color: #f8f9fa; /* Fondo ligero */
-}
-
-#temporadaCarousel .carousel-caption {
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro con opacidad */
-    color: #fff;
-    padding: 10px;
+.btn-agregar {
+    background-color: #007bff;
+    color: white;
+    border: none;
     border-radius: 5px;
+    cursor: pointer;
 }
 
-#temporadaCarousel .carousel-control-prev-icon,
-#temporadaCarousel .carousel-control-next-icon {
-    background-color: #000; /* Color de los controles del carrusel */
+.btn-agregar:hover {
+    background-color: #0056b3;
 }
 
-/* Navbar responsive */
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;  /* Acomoda los elementos verticalmente */
-        text-align: center;
-    }
-
-    .navbar .project-name {
-        margin-bottom: 10px;  /* Espacio entre los elementos */
-    }
-
-    .navbar-logo {
-        display: none;
-    }
-
-    .footer-logo {
-        display: inline-block;
-        text-align: center;
-        margin-top: 15px;
-    }
+/* Product Table */
+.tabla-productos table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-/* Estilo para el logo */
-.navbar-logo {
-    height: 80px;
-    width: auto;
-}
-
-/* Estilos adicionales */
-footer {
-    text-align: center;
+.tabla-productos th,
+.tabla-productos td {
     padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.tabla-productos th {
     background-color: #007bff;
     color: white;
 }
+
+/* Contenedor principal de las tarjetas (Flexbox) */
+.container-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.card {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo para el contenedor de la imagen */
+.image_container {
+    width: 100%;
+    max-width: 300px; /* Limita el ancho del contenedor de la imagen */
+    height: 250px; /* Fija la altura del contenedor de la imagen */
+    position: relative;
+    overflow: hidden;
+    border: 3px solid #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.image_container:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilo de la imagen */
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
+    transition: transform 0.3s ease-in-out;
+}
+
+.image_container:hover .image {
+    transform: scale(1.1); /* Efecto de zoom, limita el agrandamiento */
+}
+
+/* Título */
+.title {
+    margin-top: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+/* Estilos para las tallas */
+.size {
+    margin-top: 10px;
+}
+
+.size span {
+    font-size: 1.1em;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.list-size {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+}
+
+.item-list {
+    margin: 0;
+}
+
+/* Estilos para los botones de tallas */
+.item-list-button {
+    background-color: #e0bbf3;  /* Color violeta suave de fondo */
+    border: 1px solid #ccc;
+    padding: 6px 10px;  /* Reducir aún más el padding */
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.85em;  /* Reducir el tamaño de la fuente */
+    width: 40px;  /* Hacer los botones un poco más pequeños */
+    height: 40px;  /* Mantener la altura proporcional */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 5px;
+    margin: 0 5px;  /* Añadir espacio entre los botones */
+}
+
+.item-list-button:hover {
+    background-color: #d3a9f5;  /* Color más oscuro de violeta para hover */
+}
+
+
+/* Estilo para la sección de precio y acción */
+.action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    flex-grow: 1;
+}
+
+/* Precio */
+.price span {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+/* Botón de carrito */
+.cart-button {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.cart-button:hover {
+    background-color: #219150;
+}
+
+.cart-icon {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+
+

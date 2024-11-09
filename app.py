@@ -263,8 +263,7 @@ def index():
             'Nombre': producto[1],
             'Precio': producto[2],
             'Descripcion': producto[3],
-            'Imagen': producto[4],  
-            
+            'Imagen': producto[7], 
         }
         temporada_productos.append(producto_dict)
     print(temporada_productos)  
@@ -305,6 +304,41 @@ def categoria_hombre():
     # Pasar los productos al template
     return render_template('categoria_hombre.html', productos=productos_hombre_dict)
 
+@app.route('/nino')
+def categoria_nino():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    cursor.execute("SELECT * FROM productos WHERE ID_Categoria = 3 AND esDeTemporada = 0")
+    productos_nino = cursor.fetchall()
+    
+    # Debug: Imprimir productos para ver si están siendo seleccionados correctamente
+    print("Productos Niño:", productos_nino)
+    
+    cursor.close()
+    connection.close()
+    
+    return render_template('nino.html', productos=productos_nino)
+
+@app.route('/nina')
+def categoria_nina():
+    # Conectar a la base de datos
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    # Ejecutar la consulta para obtener productos de la categoría "Niña"
+    cursor.execute("SELECT * FROM productos WHERE ID_Categoria = 4 AND esDeTemporada = 0")  # ID_Categoria 4 representa "Niña"
+    productos_nina = cursor.fetchall()
+    
+    # Depuración: imprimir los productos de la categoría "Niña"
+    print("Productos Niña:", productos_nina)
+    
+    # Cerrar la conexión
+    cursor.close()
+    connection.close()
+    
+    # Renderizar el template de la categoría "Niña" con los productos
+    return render_template('nina.html', productos=productos_nina)
 
 
 
