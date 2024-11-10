@@ -1,5 +1,6 @@
 from flask import Flask, flash, render_template, request, redirect, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 import mysql.connector
 
 app = Flask(__name__)
@@ -17,44 +18,55 @@ def get_db_connection():
     return mysql.connector.connect(**db_config)
 
 # Registro de usuarios
-@app.route('/registro', methods=['GET', 'POST'])
-def registro():
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     if request.method == 'POST':
         username = request.form['username']
-        password = request.form['password']
-        is_admin = 1 if request.form.get('is_admin') else 0
+        password = generate_password_hash(request.form['password'])
+        is_admin = request.form.get('is_admin', 0)  # 0 para cliente común, 1 para admin
 
-        hashed_password = generate_password_hash(password)
-        connection = get_db_connection()
-        cursor = connection.cursor()
-        sql = "INSERT INTO users (username, password, is_admin) VALUES (%s, %s, %s)"
-        cursor.execute(sql, (username, hashed_password, is_admin))
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return redirect('/login')
+        try:
+            conn = mysql.connector.connect(**db_config)
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO users (username, password, is_admin) VALUES (%s, %s, %s)",
+                           (username, password, is_admin))
+            conn.commit()  # Guardar cambios en la base de datos
+            cursor.close()
+            conn.close()
+
+            flash('Registro exitoso. Ahora puedes iniciar sesión.')
+            return redirect(url_for('login'))
+        except mysql.connector.Error as err:
+            print(f"Error al insertar en la base de datos: {err}")
+            flash('Error al registrar el usuario. Intenta nuevamente.')
+            return redirect(url_for('register'))
+    
     return render_template('registro.html')
 
-# Login de usuarios
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
         user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
-            session['username'] = user['username']
             session['is_admin'] = user['is_admin']
-            return redirect('/dashboard') if user['is_admin'] else redirect('/dashboard')
+            session['username'] = user['username']
+            flash('Has iniciado sesión exitosamente.')
+            return redirect(url_for('index'))
         else:
-            flash("Nombre de usuario o contraseña incorrectos", "danger")
-        cursor.close()
-        connection.close()
+            flash('Usuario o contraseña incorrecta.')
+            return redirect(url_for('login'))
     return render_template('login.html')
+
 
 # Panel de administración
 @app.route('/admin')
@@ -74,39 +86,43 @@ def dashboard():
         descripcion = request.form['descripcion']
         precio = request.form['precio']
         stock = request.form['stock']
-        # Comprobar si el producto es de temporada
-        id_categoria = request.form['ID_Categoria'] if not request.form.get('esDeTemporada') else "5"  # 5 es la categoría de temporada
+        id_categoria = request.form['ID_Categoria'] if not request.form.get('esDeTemporada') else "5"
         id_marca = request.form['id_marca']
         imagen = request.form['imagen']
-        es_de_temporada = request.form.get('esDeTemporada') == 'on'  # Verifica si el checkbox está marcado
-
-        # Conectar a la base de datos
+        es_de_temporada = request.form.get('esDeTemporada') == 'on'
+        talle = request.form['talle']
+        
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # SQL para insertar el producto
-        query = '''
+        query_producto = '''
         INSERT INTO productos (Nombre, Descripcion, Precio, Stock, ID_Categoria, id_marca, Imagen, esDeTemporada)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         '''
-        cursor.execute(query, (nombre, descripcion, precio, stock, id_categoria, id_marca, imagen, es_de_temporada))
+        cursor.execute(query_producto, (nombre, descripcion, precio, stock, id_categoria, id_marca, imagen, es_de_temporada))
         conn.commit()
 
-        # Cerrar la conexión
+        id_producto = cursor.lastrowid
+
+        query_talle = '''
+        INSERT INTO talles (ID_Producto, Talle) VALUES (%s, %s)
+        '''
+        cursor.execute(query_talle, (id_producto, talle))
+        conn.commit()
+
         cursor.close()
         conn.close()
 
         return redirect(url_for('dashboard'))
-
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = '''
+    query_productos = '''
     SELECT productos.*, categorias.Nombre AS Categoria
     FROM productos
     JOIN categorias ON productos.ID_Categoria = categorias.ID_Categoria
     '''
-    cursor.execute(query)
+    cursor.execute(query_productos)
     productos = cursor.fetchall()
 
     cursor.execute('SELECT * FROM categorias')
@@ -155,19 +171,23 @@ def add_to_favorites(producto_id):
     
     cursor.close()
     conn.close()
-    return redirect(url_for('productos_categoria', categoria='todos'))
+    return redirect(url_for('productos_categoria', categoria='Hombre'))
 
-@app.route('/eliminar_producto/<int:producto_id>', methods=['POST'])
-def eliminar_producto(producto_id):
+@app.route('/eliminar_producto_dashboard/<int:producto_id>', methods=['POST'])
+def eliminar_producto_from_dashboard(producto_id):
     if not session.get('is_admin'):
         return redirect(url_for('login'))
+    
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM productos WHERE ID = %s', (producto_id,))
+    cursor.execute("DELETE FROM talles WHERE ID_Producto = %s", (producto_id,))
     conn.commit()
+    cursor.execute("DELETE FROM productos WHERE ID_Producto = %s", (producto_id,))
+    conn.commit()
+
     cursor.close()
     conn.close()
-    flash("Producto eliminado.", "success")
+    flash("Producto eliminado correctamente")
     return redirect(url_for('dashboard'))
 
 @app.route('/favoritos')
@@ -193,25 +213,28 @@ def favoritos():
     conn.close()
     return render_template('favoritos.html', favoritos=favoritos)
 
-# Inicializar el carrito
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Has cerrado sesión exitosamente.')
+    return redirect(url_for('login'))
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.before_request
 def init_cart():
     if 'carrito' not in session:
         session['carrito'] = []
 
-from flask import session
-
-
 @app.route('/agregar_al_carrito/<int:producto_id>', methods=['POST'])
 def agregar_al_carrito(producto_id):
-    
     cantidad = int(request.form.get('cantidad', 1))
 
-    
     if 'carrito' not in session:
         session['carrito'] = []
 
-    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM productos WHERE ID_Producto = %s", (producto_id,))
@@ -219,7 +242,6 @@ def agregar_al_carrito(producto_id):
     cursor.close()
     conn.close()
 
-    
     if producto:
         item = {
             'id': producto['ID_Producto'],
@@ -233,119 +255,26 @@ def agregar_al_carrito(producto_id):
 
     return redirect(url_for('ver_carrito'))
 
-@app.route('/ver_carrito')
+@app.route('/carrito')
 def ver_carrito():
+    carrito = [
+        {'nombre': 'Producto 1', 'descripcion': 'Descripción 1', 'precio': 19.99, 'cantidad': 2},
+        {'nombre': 'Producto 2', 'descripcion': 'Descripción 2', 'precio': 29.99, 'cantidad': 1}
+    ]
     
-    print("Contenido del carrito:", session.get('carrito'))
+    # Calcular el total
+    total = sum(float(item['precio']) * int(item['cantidad']) for item in carrito)
+    
+    # Renderizar el template 'carrito.html'
+    return render_template('carrito.html', carrito=carrito, total=total)
+
+
+@app.route('/eliminar_del_carrito/<int:producto_id>', methods=['POST'])
+def eliminar_del_carrito(producto_id):
     carrito = session.get('carrito', [])
-    return render_template('carrito.html', carrito=carrito)
-
-@app.route('/')
-def index():
-    
-    connection = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='',
-        database='tuzapatos'
-    )
-    cursor = connection.cursor()
-    
-    
-    cursor.execute("SELECT * FROM productos WHERE esDeTemporada = 1")
-    productos = cursor.fetchall()  
-    
-    
-    temporada_productos = []
-    for producto in productos:
-        producto_dict = {
-            'ID_Producto': producto[0],  
-            'Nombre': producto[1],
-            'Precio': producto[2],
-            'Descripcion': producto[3],
-            'Imagen': producto[7], 
-        }
-        temporada_productos.append(producto_dict)
-    print(temporada_productos)  
-
-    connection.close()
-    return render_template('index.html', temporada_productos=temporada_productos)
+    session['carrito'] = [item for item in carrito if item['id'] != producto_id]
+    return redirect(url_for('ver_carrito'))
 
 
-@app.route('/hombre')
-def categoria_hombre():
-    # Crear una conexión a la base de datos
-    connection = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='',
-        database='tuzapatos'
-    )
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM productos WHERE categoria = 'Hombre' AND esDeTemporada = 0")
-    productos_hombre = cursor.fetchall()  
-   
-    productos_hombre_dict = []
-    for producto in productos_hombre:
-        producto_dict = {
-            'ID_Producto': producto[0],
-            'Nombre': producto[1],
-            'Precio': producto[2],
-            'Descripcion': producto[3],
-            'Imagen': producto[4],
-            'Temporada': producto[5],  
-            'Categoria': producto[6],  
-        }
-        productos_hombre_dict.append(producto_dict)
-
-    
-    connection.close()
-
-    # Pasar los productos al template
-    return render_template('categoria_hombre.html', productos=productos_hombre_dict)
-
-@app.route('/nino')
-def categoria_nino():
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    
-    cursor.execute("SELECT * FROM productos WHERE ID_Categoria = 3 AND esDeTemporada = 0")
-    productos_nino = cursor.fetchall()
-    
-    # Debug: Imprimir productos para ver si están siendo seleccionados correctamente
-    print("Productos Niño:", productos_nino)
-    
-    cursor.close()
-    connection.close()
-    
-    return render_template('nino.html', productos=productos_nino)
-
-@app.route('/nina')
-def categoria_nina():
-    # Conectar a la base de datos
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    
-    # Ejecutar la consulta para obtener productos de la categoría "Niña"
-    cursor.execute("SELECT * FROM productos WHERE ID_Categoria = 4 AND esDeTemporada = 0")  # ID_Categoria 4 representa "Niña"
-    productos_nina = cursor.fetchall()
-    
-    # Depuración: imprimir los productos de la categoría "Niña"
-    print("Productos Niña:", productos_nina)
-    
-    # Cerrar la conexión
-    cursor.close()
-    connection.close()
-    
-    # Renderizar el template de la categoría "Niña" con los productos
-    return render_template('nina.html', productos=productos_nina)
-
-
-
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
 if __name__ == '__main__':
     app.run(debug=True)

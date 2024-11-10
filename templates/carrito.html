@@ -1,17 +1,25 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="container mt-4">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+</head>
+<body>
     <h2>Carrito de Compras</h2>
-    <div class="cart-container" style="background-color: #ffffff; padding: 20px; border-radius: 8px;">
+    <div class="carrito">
         {% for item in carrito %}
-            <div class="cart-item" style="background-color: #f8d7da; padding: 15px; margin-bottom: 10px; border-radius: 6px;">
-                <h4>{{ item.nombre }}</h4>
-                <p>{{ item.descripcion }}</p>
-                <p>Precio: ${{ item.precio }}</p>
+            <div class="producto">
+                <p><strong>{{ item.nombre }}</strong></p>
+                <p>Descripción: {{ item.descripcion }}</p>
+                <p>Precio unitario: ${{ item.precio }}</p>
                 <p>Cantidad: {{ item.cantidad }}</p>
+                <p>Subtotal: ${{ item.precio * item.cantidad }}</p>
             </div>
+            <hr>
         {% endfor %}
+        
+        <h3>Total del carrito: ${{ total }}</h3>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>

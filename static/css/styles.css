@@ -10,10 +10,75 @@ body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f9;
 }
+/* Navbar Principal */
+.navbar-main {
+    background-color: #0062cc;
+    padding: 15px 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 18px;
+    z-index: 1000;
+}
+
+.navbar-main .navbar-brand img {
+    height: 50px;
+    width: auto;
+}
+
+.navbar-main .navbar-nav .nav-link {
+    color: #ffffff;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.navbar-main .navbar-nav .nav-link:hover {
+    color: #ffdd57;
+}
+
+.navbar-main .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+.navbar-main .navbar-collapse {
+    justify-content: space-between;
+}
+
+.navbar-main .d-flex a {
+    color: #ffffff;
+    font-size: 1.4rem;
+    margin-left: 15px;
+    transition: color 0.3s;
+}
+
+.navbar-main .d-flex a:hover {
+    color: #ffdd57;
+}
+
+/* Search Bar Styling */
+.navbar-main .form-control {
+    border-radius: 30px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease;
+}
+
+.navbar-main .form-control:focus {
+    border-color: #ffdd57;
+}
+
+.navbar-main .btn-outline-success {
+    color: #ffffff;
+    border-color: #ffdd57;
+    transition: background-color 0.3s;
+}
+
+.navbar-main .btn-outline-success:hover {
+    background-color: #ffdd57;
+    color: #ffffff;
+}
+
 
 /* Navbar */
-.navbar {
-    background-color: #ffffff;
+.navbar-ds {
+    background-color: #1235ff;
     padding: 15px 30px;
     display: flex;
     align-items: center;
@@ -26,17 +91,17 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     margin: 0;
     font-size: 20px;
-    font-style: initial;
+    
 }
 
-.navbar .project-name {
+.navbar-ds .project-name {
     font-size: 24px;
     font-weight: bold;
     color: white;
     text-decoration: none;
 }
 
-.navbar .welcome-message {
+.navbar-ds .welcome-message {
     font-size: 22px;
     font-weight: bold;
     color: white;

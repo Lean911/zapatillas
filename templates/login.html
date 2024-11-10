@@ -80,13 +80,14 @@
         </div>
         <div class="button-group">
             <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-            <a href="{{ url_for('registro') }}" class="btn btn-outline-primary">Registrate</a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-primary">Registrate</a>
         </div>
         <div class="link">
             <a href="#" class="text-primary">¿Olvidaste la contraseña?</a>
         </div>
     </form>
 
+    <!-- Mensajes de flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="mt-3">

@@ -10,7 +10,7 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-main">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{url_for('index')}}">
                 <img src="/static/img/almacenDeCalzsado-nobg.png" alt="Logo" class="navbar-logo">
@@ -43,24 +43,24 @@
                     <a href="#" class="nav-link">
                         <i class="bi bi-heart-fill text-danger" style="font-size: 1.5rem;"></i>
                     </a>
-                    <a href="#" class="nav-link ms-2">
-                        <i class="bi bi-cart-fill text-warning" style="font-size: 1.5rem;" href="{{url_for('ver_carrito')}}"></i>
+                    <a href="{{url_for('ver_carrito')}}" class="nav-link ms-2">
+                        <i class="bi bi-cart-fill text-warning" style="font-size: 1.5rem;"></i>
                     </a>
                     {% if session.get('username') %}
                         <span class="nav-link ms-2">Hola, {{ session['username'] }}</span>
                         {% if session.get('is_admin') %}
                             <a href="{{ url_for('dashboard') }}" class="nav-link ms-2">
-                                <i class="bi bi-house-door" style="font-size: 1.5rem;"></i> Dashboard
+                                <i class="bi bi-house-door" style="font-size: 1.5rem;"></i> 
                             </a>
                         {% endif %}
                         <a href="{{ url_for('logout') }}" class="nav-link ms-2">
-                            <i class="bi bi-box-arrow-right" style="font-size: 1.5rem;"></i> Cerrar sesión
+                            <i class="bi bi-box-arrow-right" style="font-size: 1.5rem;"></i> 
                         </a>
                     {% else %}
                         <a href="{{url_for('login')}}" class="nav-link ms-2">
                             <i class="bi bi-person-fill" style="font-size: 1.5rem;"></i>
                         </a>
-                        <a href="{{url_for('registro')}}" class="nav-link ms-2">
+                        <a href="{{ url_for('register') }}" class="nav-link ms-2">
                             <i class="bi bi-person-plus-fill" style="font-size: 1.5rem;"></i> 
                         </a>
                     {% endif %}
