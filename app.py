@@ -1,21 +1,37 @@
 from flask import Flask, flash, render_template, request, redirect, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
 import mysql.connector
+import secrets
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
 
-# Configuración de la base de datos MySQL
+# Asegúrate de que la secret_key esté definida antes de cualquier uso de la sesión
+app.secret_key = secrets.token_hex(16)  # Genera una clave secreta única
+
+# Configuración de la base de datos
 db_config = {
     'host': 'localhost',
     'user': 'root',
     'password': '',
-    'database': 'tuZapatos',  # Asegúrate de usar tu nombre de base de datos
+    'database': 'tuZapatos',  
 }
 
 def get_db_connection():
     return mysql.connector.connect(**db_config)
+
+@app.route('/ver_carrito')
+def ver_carrito():
+    if 'user_id' not in session:  # Verifica si el usuario está logueado
+        flash("Inicia sesión primero para ver tu carrito", 'error')
+        return redirect(url_for('login'))  # Redirige al inicio de sesión si no está logueado
+    
+    # Lógica para mostrar el carrito
+    if 'carrito' not in session or len(session['carrito']) == 0:
+        flash("Tu carrito está vacío.", 'info')
+        return redirect(url_for('index'))
+    
+    total = sum(item['precio'] * item['cantidad'] for item in session['carrito'])
+    return render_template('carrito.html', carrito=session['carrito'], total=total)
 
 # Registro de usuarios
 @app.route('/register', methods=['GET', 'POST'])
@@ -26,7 +42,7 @@ def register():
         is_admin = request.form.get('is_admin', 0)  # 0 para cliente común, 1 para admin
 
         try:
-            conn = mysql.connector.connect(**db_config)
+            conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("INSERT INTO users (username, password, is_admin) VALUES (%s, %s, %s)",
                            (username, password, is_admin))
@@ -43,13 +59,14 @@ def register():
     
     return render_template('registro.html')
 
+# Login de usuarios
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        conn = mysql.connector.connect(**db_config)
+        conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
         user = cursor.fetchone()
@@ -67,7 +84,6 @@ def login():
             return redirect(url_for('login'))
     return render_template('login.html')
 
-
 # Panel de administración
 @app.route('/admin')
 def admin():
@@ -75,6 +91,7 @@ def admin():
         return "Acceso denegado. Solo administradores."
     return render_template('admin.html')
 
+# Dashboard de administración
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if not session.get('is_admin'):
@@ -134,6 +151,32 @@ def dashboard():
     conn.close()
     return render_template('dashboard.html', productos=productos, categorias=categorias, marcas=marcas)
 
+# Buscar productos
+@app.route('/buscar', methods=['GET'])
+def buscar():
+    # Obtener el término de búsqueda desde el formulario
+    termino_busqueda = request.args.get('search', '')
+
+    # Conectar a la base de datos
+    conexion = get_db_connection()
+
+    # Crear un cursor para ejecutar la consulta
+    cursor = conexion.cursor()
+
+    # Consulta SQL para buscar productos que coincidan con el término
+    consulta = "SELECT * FROM productos WHERE nombre_producto LIKE %s"
+    cursor.execute(consulta, (f"%{termino_busqueda}%",))
+
+    # Obtener los resultados
+    resultados = cursor.fetchall()
+
+    # Cerrar la conexión
+    cursor.close()
+    conexion.close()
+
+    # Renderizar el template con los resultados de búsqueda
+    return render_template('resultados.html', resultados=resultados)
+
 # Productos por categoría
 @app.route('/productos/<categoria>')
 def productos_categoria(categoria):
@@ -149,6 +192,7 @@ def productos_categoria(categoria):
     conn.close()
     return render_template(f'{categoria}.html', productos=productos)
 
+# Agregar producto a favoritos
 @app.route('/add_to_favorites/<int:producto_id>', methods=['POST'])
 def add_to_favorites(producto_id):
     if 'user_id' not in session:
@@ -173,6 +217,7 @@ def add_to_favorites(producto_id):
     conn.close()
     return redirect(url_for('productos_categoria', categoria='Hombre'))
 
+# Eliminar producto del dashboard
 @app.route('/eliminar_producto_dashboard/<int:producto_id>', methods=['POST'])
 def eliminar_producto_from_dashboard(producto_id):
     if not session.get('is_admin'):
@@ -190,6 +235,7 @@ def eliminar_producto_from_dashboard(producto_id):
     flash("Producto eliminado correctamente")
     return redirect(url_for('dashboard'))
 
+# Ver favoritos
 @app.route('/favoritos')
 def favoritos():
     if 'user_id' not in session:
@@ -213,21 +259,25 @@ def favoritos():
     conn.close()
     return render_template('favoritos.html', favoritos=favoritos)
 
+# Cerrar sesión
 @app.route('/logout')
 def logout():
     session.clear()
     flash('Has cerrado sesión exitosamente.')
     return redirect(url_for('login'))
 
+# Página principal
 @app.route('/')
 def index():
     return render_template('index.html')
 
+# Inicializar carrito
 @app.before_request
 def init_cart():
     if 'carrito' not in session:
         session['carrito'] = []
 
+# Agregar al carrito
 @app.route('/agregar_al_carrito/<int:producto_id>', methods=['POST'])
 def agregar_al_carrito(producto_id):
     cantidad = int(request.form.get('cantidad', 1))
@@ -237,44 +287,24 @@ def agregar_al_carrito(producto_id):
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM productos WHERE ID_Producto = %s", (producto_id,))
+    cursor.execute("SELECT * FROM productos WHERE ID = %s", (producto_id,))
     producto = cursor.fetchone()
     cursor.close()
     conn.close()
 
     if producto:
         item = {
-            'id': producto['ID_Producto'],
+            'id': producto['ID'],
             'nombre': producto['Nombre'],
-            'descripcion': producto['Descripcion'],
             'precio': producto['Precio'],
             'cantidad': cantidad
         }
         session['carrito'].append(item)
-        session.modified = True  
+        flash(f"Producto {producto['Nombre']} agregado al carrito.")
+    else:
+        flash("Producto no encontrado.")
 
-    return redirect(url_for('ver_carrito'))
+    return redirect(url_for('index'))
 
-@app.route('/carrito')
-def ver_carrito():
-    carrito = [
-        {'nombre': 'Producto 1', 'descripcion': 'Descripción 1', 'precio': 19.99, 'cantidad': 2},
-        {'nombre': 'Producto 2', 'descripcion': 'Descripción 2', 'precio': 29.99, 'cantidad': 1}
-    ]
-    
-    # Calcular el total
-    total = sum(float(item['precio']) * int(item['cantidad']) for item in carrito)
-    
-    # Renderizar el template 'carrito.html'
-    return render_template('carrito.html', carrito=carrito, total=total)
-
-
-@app.route('/eliminar_del_carrito/<int:producto_id>', methods=['POST'])
-def eliminar_del_carrito(producto_id):
-    carrito = session.get('carrito', [])
-    session['carrito'] = [item for item in carrito if item['id'] != producto_id]
-    return redirect(url_for('ver_carrito'))
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

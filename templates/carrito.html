@@ -1,25 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito de Compras</title>
-</head>
-<body>
-    <h2>Carrito de Compras</h2>
-    <div class="carrito">
-        {% for item in carrito %}
-            <div class="producto">
-                <p><strong>{{ item.nombre }}</strong></p>
-                <p>Descripción: {{ item.descripcion }}</p>
-                <p>Precio unitario: ${{ item.precio }}</p>
-                <p>Cantidad: {{ item.cantidad }}</p>
-                <p>Subtotal: ${{ item.precio * item.cantidad }}</p>
-            </div>
-            <hr>
-        {% endfor %}
-        
-        <h3>Total del carrito: ${{ total }}</h3>
+<!-- carrito.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Tu carrito de compras</h2>
+
+    {% if carrito %}
+        <ul>
+            {% for item in carrito %}
+                <li>
+                    {{ item.nombre }} - ${{ item.precio }} x {{ item.cantidad }} = ${{ item.precio * item.cantidad }}
+                </li>
+            {% endfor %}
+        </ul>
+        <h3>Total: ${{ total }}</h3>
+    {% else %}
+        <p>No hay productos en tu carrito.</p>
+    {% endif %}
+{% endblock %}
+
+<hr>
+
+<!-- Footer con el logo en móviles -->
+<footer class="text-center mt-4">
+    <div class="footer-logo">
+        <img src="/static/img/almacenDeCalzsado-nobg.png" alt="Logo Footer" class="img-fluid" height="80" width="153">
     </div>
-</body>
-</html>
+    <p>© 2024 Almacen de Calzado - Todos los derechos reservados</p>
+</footer>
