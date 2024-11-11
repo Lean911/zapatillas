@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a href="{{ url_for('ver_carrito') }}" class="navbar-link">Carrito</a>
+        </div>
+        <div class="navbar-right">
+            <span>Hola, {{ session['username'] }}</span>
+        </div>
+    </nav>
+
+    <!-- Checkout Container -->
+    <div class="checkout-container">
+        <div class="checkout-box">
+            <h2>Resumen del Carrito</h2>
+            <table class="checkout-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in carrito %}
+                    <tr class="product-row">
+                        <td class="product-name">{{ item['nombre'] }}</td>
+                        <td>{{ item['cantidad'] }}</td>
+                        <td>${{ item['precio'] }}</td>
+                        <td>${{ item['precio'] * item['cantidad'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="checkout-total">
+                <span>Total: ${{ total }}</span>
+            </div>
+
+            <!-- Opciones de pago -->
+            <div class="payment-options">
+                <h3>Selecciona tu método de pago</h3>
+                <form action="{{ url_for('pagar') }}" method="post">
+                    <button class="payment-button" type="submit">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Logo_Mercado_Pago.png" alt="Mercado Pago" class="payment-logo">
+                        Pagar con Mercado Pago
+                    </button>
+                    <button class="payment-button" type="submit">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Logo_de_Tarjeta_Credito.svg" alt="Tarjeta" class="payment-logo">
+                        Pagar con Tarjeta
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

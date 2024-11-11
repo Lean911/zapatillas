@@ -1,29 +1,58 @@
-<!-- carrito.html -->
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar-co">
+        <div class="navbar-left-co">
+            <a href="{{ url_for('ver_carrito') }}" class="navbar-link">Carrito</a>
+        </div>
+        <div class="navbar-right-co">
+            <span>Hola, {{ session['username'] }}</span>
+        </div>
+    </nav>
 
-{% block content %}
-    <h2>Tu carrito de compras</h2>
+    <!-- Carrito Container -->
+    <div class="carrito-container">
+        <div class="carrito-box">
+            <h2>Resumen de tu Carrito</h2>
+            <!-- Tabla de productos -->
+            <table class="carrito-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Descripción</th>
+                        <th>Modelo</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in carrito %}
+                    <tr>
+                        <td>{{ item['nombre'] }}</td>
+                        <td>{{ item['descripcion'] }}</td>
+                        <td>{{ item['modelo'] }}</td>
+                        <td>${{ item['precio'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-    {% if carrito %}
-        <ul>
-            {% for item in carrito %}
-                <li>
-                    {{ item.nombre }} - ${{ item.precio }} x {{ item.cantidad }} = ${{ item.precio * item.cantidad }}
-                </li>
-            {% endfor %}
-        </ul>
-        <h3>Total: ${{ total }}</h3>
-    {% else %}
-        <p>No hay productos en tu carrito.</p>
-    {% endif %}
-{% endblock %}
+            <!-- Total -->
+            <div class="carrito-total">
+                <span><strong>Total: </strong>${{ total }}</span>
+            </div>
 
-<hr>
-
-<!-- Footer con el logo en móviles -->
-<footer class="text-center mt-4">
-    <div class="footer-logo">
-        <img src="/static/img/almacenDeCalzsado-nobg.png" alt="Logo Footer" class="img-fluid" height="80" width="153">
+            <form action="{{ url_for('checkout') }}" method="POST">
+                <button type="submit" class="btn-pagar">Proceder a pago</button>
+            </form>
+            
+        </div>
     </div>
-    <p>© 2024 Almacen de Calzado - Todos los derechos reservados</p>
-</footer>
+</body>
+</html>

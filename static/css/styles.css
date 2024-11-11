@@ -423,3 +423,138 @@ body {
     border-color: #0056b3;
 }
 
+
+
+/*Estilos del chackout*/
+
+/* General Body & Navbar Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-co {
+    display: flex;
+    justify-content: space-between;
+    background-color: #4CAF50;
+    padding: 15px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.navbar-left-co a,
+.navbar-right-co span {
+    color: white;
+    text-decoration: none;
+}
+
+.navbar-left a:hover {
+    text-decoration: underline;
+}
+
+/* Checkout Container */
+.checkout-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.checkout-box {
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+    width: 70%;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+.checkout-table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+.checkout-table th,
+.checkout-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.product-row:hover {
+    background-color: #f9f9f9;
+}
+
+.product-name {
+    font-weight: bold;
+    color: #333;
+}
+
+.checkout-total {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 10px;
+    color: #333;
+}
+
+.payment-options {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.payment-options h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.payment-button {
+    background-color: #0070f3;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.payment-button:hover {
+    background-color: #005bb5;
+}
+
+.payment-logo {
+    margin-right: 10px;
+    height: 25px;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .checkout-container {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .checkout-box {
+        width: 100%;
+    }
+
+    .payment-button {
+        width: 100%;
+    }
+}
+
+
