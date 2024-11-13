@@ -1,58 +1,47 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito de Compras</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar-co">
-        <div class="navbar-left-co">
-            <a href="{{ url_for('ver_carrito') }}" class="navbar-link">Carrito</a>
-        </div>
-        <div class="navbar-right-co">
-            <span>Hola, {{ session['username'] }}</span>
-        </div>
-    </nav>
+{% extends "base.html" %}
 
-    <!-- Carrito Container -->
-    <div class="carrito-container">
-        <div class="carrito-box">
-            <h2>Resumen de tu Carrito</h2>
-            <!-- Tabla de productos -->
-            <table class="carrito-table">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Descripción</th>
-                        <th>Modelo</th>
-                        <th>Precio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in carrito %}
-                    <tr>
-                        <td>{{ item['nombre'] }}</td>
-                        <td>{{ item['descripcion'] }}</td>
-                        <td>{{ item['modelo'] }}</td>
-                        <td>${{ item['precio'] }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+{% block title %}Carrito de Compras{% endblock %}
 
-            <!-- Total -->
-            <div class="carrito-total">
-                <span><strong>Total: </strong>${{ total }}</span>
-            </div>
+{% block content %}
+<div class="carrito-container">
+    <div class="carrito-box">
+        <h2>Resumen de tu Carrito</h2>
+        <!-- Tabla de productos -->
+        <table class="carrito-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Descripción</th>
+                    <th>Modelo</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carrito %}
+                <tr>
+                    <td>{{ item['nombre'] }}</td>
+                    <td>{{ item['descripcion'] }}</td>
+                    <td>{{ item.get('modelo', 'Desconocido') }}</td> <!-- Modelo puede ser opcional -->
+                    <td>${{ item['precio'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
 
-            <form action="{{ url_for('checkout') }}" method="POST">
-                <button type="submit" class="btn-pagar">Proceder a pago</button>
-            </form>
-            
+        <!-- Total -->
+        <div class="carrito-total">
+            <span><strong>Total: </strong>${{ total }}</span>
         </div>
+
+        <form action="{{ url_for('pagar') }}" method="POST">
+            <label for="pago">Selecciona un método de pago:</label><br>
+            <input type="radio" name="pago" value="mercado_pago" id="mercado_pago" required>
+            <label for="mercado_pago">Mercado Pago</label><br>
+            <input type="radio" name="pago" value="tarjeta" id="tarjeta" required>
+            <label for="tarjeta">Tarjeta de Crédito/Débito</label><br>
+            <button type="submit" class="btn-pagar">Proceder a pago</button>
+        </form>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

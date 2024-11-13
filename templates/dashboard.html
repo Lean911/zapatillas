@@ -99,7 +99,7 @@
                                 <td>
     <button class="btn-editar">Editar</button>
     <!-- Suponiendo que 'producto.id' es el identificador del producto -->
-    <<form action="{{ url_for('eliminar_del_carrito', producto_id=producto['ID_Producto']) }}" method="POST">
+    <form action="{{ url_for('eliminar_producto_dashboard', producto_id=producto['ID_Producto']) }}" method="POST">
         <button type="submit" class="btn-warning">Eliminar</button>
     </form>
 </td>

@@ -9,6 +9,14 @@
     <title>Almacen de Calzado</title>
 </head>
 <body>
+    <!-- Banner de cuenta regresiva -->
+            <div id="banner-oferta" class="banner">
+                <p>
+                    🌟 <strong>Ofertas Temporada 2024</strong> hasta <strong>60% OFF</strong> 🌟
+                <span id="countdown"></span>
+                </p>
+            </div>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top navbar-main">
         <div class="container-fluid">
@@ -143,7 +151,40 @@
                 }
             })
             .catch(error => console.error('Error:', error));
+
         }
+
+        // Cuenta regresiva
+        function iniciarCuentaRegresiva(fechaLimite) {
+            const countdownElement = document.getElementById('countdown');
+
+        function actualizarCuenta() {
+            const ahora = new Date().getTime();
+            const distancia = fechaLimite - ahora;
+
+            if (distancia <= 0) {
+                countdownElement.textContent = "¡Últimas horas!";
+                clearInterval(intervalo);
+            return;
+            }
+
+            const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+
+            countdownElement.textContent = `${dias}d ${horas}h ${minutos}m ${segundos}s`;
+        }
+
+        actualizarCuenta(); // Llama inmediatamente para evitar el retraso inicial
+            const intervalo = setInterval(actualizarCuenta, 1000);
+        }
+
+        // Define la fecha límite (por ejemplo, 31 de diciembre de 2024 a las 23:59:59)
+            const fechaLimite = new Date('2024-12-31T23:59:59').getTime();
+            iniciarCuentaRegresiva(fechaLimite);
+
+        
     </script>
 </body>
 </html>

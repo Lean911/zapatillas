@@ -131,6 +131,16 @@ body {
         text-align: center;
         margin-top: 15px;
     }
+    .container-cards {
+        flex-direction: column; /* Apilar las tarjetas verticalmente */
+        align-items: center;
+    }
+    .card {
+        width: 100%;
+        max-width: 90%; /* Asegura que no ocupen todo el ancho */
+    }
+    
+    
 }
 
 /* Main container */
@@ -234,22 +244,35 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: space-between;
+    justify-content: center; /* Centra las tarjetas horizontalmente */
     padding: 20px;
 }
+
+.truncate-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+}
+
 
 .card {
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 16px;
-    margin: 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 300px; /* Fijar un ancho máximo */
+    min-height: 420px; /* Fijar una altura mínima */
+    justify-content: space-between; /* Espaciado uniforme */
 }
+
 
 .card:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -258,15 +281,16 @@ body {
 /* Estilo para el contenedor de la imagen */
 .image_container {
     width: 100%;
-    max-width: 300px; /* Limita el ancho del contenedor de la imagen */
-    height: 250px; /* Fija la altura del contenedor de la imagen */
-    position: relative;
+    max-width: 280px;
+    height: 200px; /* Ajusta la altura si es necesario */
     overflow: hidden;
-    border: 3px solid #f0f0f0;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9; /* Fondo neutro para las imágenes que no cargan */
 }
+
 
 .image_container:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -359,21 +383,22 @@ body {
 
 /* Botón de carrito */
 .cart-button {
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 1em;
-    border-radius: 5px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
     transition: background-color 0.3s ease;
+    width: 100%;
+}
+.cart-button:hover {
+    background-color: #0056b3;
 }
 
-.cart-button:hover {
-    background-color: #219150;
-}
 
 .cart-icon {
     margin-right: 10px;
@@ -423,138 +448,115 @@ body {
     border-color: #0056b3;
 }
 
+/* Estilos para el banner */
+.banner {
+    background-color: #ff4d4d;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.banner p {
+    margin: 0;
+}
+#countdown {
+    font-weight: bold;
+    color: #ffd700;
+}
+.navbar-main {
+    margin-top: 50px; /* Ajusta según el alto del banner */
+}
 
 
 /*Estilos del chackout*/
 
-/* General Body & Navbar Styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    margin: 0;
-    padding: 0;
-}
 
-.navbar-co {
+/* Navbar */
+.navbar, .navbar-co {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #0d5fdb; /* Ajusta el color de fondo si es necesario */
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
-    background-color: #4CAF50;
-    padding: 15px;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
+    align-items: center;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.navbar-left-co a,
-.navbar-right-co span {
-    color: white;
-    text-decoration: none;
-}
-
-.navbar-left a:hover {
-    text-decoration: underline;
-}
-
-/* Checkout Container */
-.checkout-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.checkout-box {
-    background-color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+/* Main container (carrito-container or checkout-container) */
+.carrito-container, .checkout-container {
+    margin-top: 80px; /* Da espacio para que el navbar no se superponga */
     padding: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    width: 70%;
 }
 
-h2 {
-    text-align: center;
-    color: #333;
-}
-
-.checkout-table {
+/* General table styling */
+table {
     width: 100%;
-    margin-bottom: 20px;
     border-collapse: collapse;
+    margin-bottom: 20px;
 }
 
-.checkout-table th,
-.checkout-table td {
-    padding: 12px;
-    text-align: center;
+thead th, tbody td {
+    padding: 10px;
+    text-align: left;
     border-bottom: 1px solid #ddd;
 }
 
-.product-row:hover {
-    background-color: #f9f9f9;
+tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
 
-.product-name {
-    font-weight: bold;
-    color: #333;
-}
-
-.checkout-total {
-    font-size: 18px;
+/* Total section styling */
+.carrito-total, .checkout-total {
+    font-size: 1.2em;
     font-weight: bold;
     text-align: right;
-    margin-top: 10px;
-    color: #333;
-}
-
-.payment-options {
     margin-top: 20px;
-    text-align: center;
 }
 
-.payment-options h3 {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 15px;
-}
-
-.payment-button {
-    background-color: #0070f3;
-    color: white;
-    padding: 12px 20px;
+/* Payment buttons */
+.btn-pagar, .payment-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    color: #ffffff;
+    background-color: #007bff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin: 10px 0;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+    margin-top: 10px;
     transition: background-color 0.3s ease;
 }
 
-.payment-button:hover {
-    background-color: #005bb5;
+.btn-pagar:hover, .payment-button:hover {
+    background-color: #0056b3;
 }
 
-.payment-logo {
-    margin-right: 10px;
-    height: 25px;
-}
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-    .checkout-container {
-        flex-direction: column;
-        padding: 20px;
-    }
-
-    .checkout-box {
-        width: 100%;
-    }
-
-    .payment-button {
-        width: 100%;
-    }
+/* Flash messages */
+.flashes {
+    position: fixed;
+    top: 60px; /* Debajo del navbar */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px 20px;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    z-index: 1100;
 }
 
 
