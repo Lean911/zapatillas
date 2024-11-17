@@ -1,52 +1,79 @@
 {% extends "base.html" %}
 
-{% block title %}Checkout{% endblock %}
+{% block navbar %}
+<!-- Navbar específico para checkout -->
+<nav class="navbar-co">
+    <div class="navbar-co-content">
+        <span class="navbar-brand">Checkout</span>
+        <span class="navbar-welcome">Hola, {{ user_name }}</span>
+    </div>
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="checkout-container">
-    <div class="checkout-box">
-        <h2>Resumen del Carrito</h2>
+<div class="carrito-container">
+    <!-- Caja de resumen del pedido -->
+    <div class="carrito-box">
+        <h2>Resumen del Pedido</h2>
         <table class="carrito-table">
             <thead>
                 <tr>
                     <th>Producto</th>
                     <th>Descripción</th>
                     <th>Modelo</th>
+                    <th>Cantidad</th>
                     <th>Precio</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in carrito %}
-                <tr>
-                    <td>{{ item['nombre'] }}</td>
-                    <td>{{ item['descripcion'] }}</td>
-                    <td>{{ item.get('modelo', 'Desconocido') }}</td> <!-- Modelo puede ser opcional -->
-                    <td>${{ item['precio'] }}</td>
+                <tr class="product-item" data-product-id="{{ item.id }}">
+                    <td>{{ item.nombre }}</td>
+                    <td>{{ item.descripcion }}</td>
+                    <td>{{ item.modelo }}</td>
+                    <td>
+                        <div class="product-quantity">
+                            <button class="btn-decrease">-</button>
+                            <input type="number" class="quantity-input" value="{{ item.cantidad }}" min="1" readonly>
+                            <button class="btn-increase">+</button>
+                        </div>
+                    </td>
+                    <td>${{ item.precio }}</td>
+                    <td class="product-total">${{ item.precio * item.cantidad }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        
-
-        <div class="checkout-total">
-            <span>Total: ${{ total }}</span>
-        </div>
-
-        <!-- Opciones de pago -->
-        <div class="payment-options">
-            <h3>Selecciona tu método de pago</h3>
-            <form action="{{ url_for('/procesar_pago') }}" method="post">
-                <button class="payment-button" type="submit" name="pago" value="mercado_pago">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Logo_Mercado_Pago.png" alt="Mercado Pago" class="payment-logo">
-                    Pagar con Mercado Pago
-                </button>
-                <button class="payment-button" type="submit" name="pago" value="tarjeta">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Logo_de_Tarjeta_Credito.svg" alt="Tarjeta" class="payment-logo">
-                    Pagar con Tarjeta
-                </button>
-            </form>
+        <div class="carrito-total">
+            <span><strong>Total a abonar: </strong>${{ total }}</span>
         </div>
     </div>
-</div>
 
+    <!-- Caja de métodos de pago -->
+    <div class="carrito-box">
+        <form method="POST" action="{{ url_for('checkout') }}">
+            <h2>Selecciona tu Método de Pago</h2>
+            <div>
+                <label>
+                    <input type="radio" name="pago" value="mercado_pago" required>
+                    Mercado Pago
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="radio" name="pago" value="tarjeta" required>
+                    Tarjeta de Crédito/Débito
+                </label>
+            </div>
+            <button type="submit" class="btn-pagar">Proceder al Pago</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Copia y ajusta la lógica de carrito.html para el manejo de cantidades si aplica
+</script>
 {% endblock %}

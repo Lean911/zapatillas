@@ -13,35 +13,95 @@
                     <th>Producto</th>
                     <th>Descripción</th>
                     <th>Modelo</th>
+                    <th>Cantidad</th>
                     <th>Precio</th>
+                    <th>Total</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in carrito %}
-                <tr>
+                <tr class="product-item" data-product-id="{{ item['id'] }}">
                     <td>{{ item['nombre'] }}</td>
                     <td>{{ item['descripcion'] }}</td>
-                    <td>{{ item.get('modelo', 'Desconocido') }}</td> <!-- Modelo puede ser opcional -->
+                    <td>{{ item.get('modelo', 'Desconocido') }}</td>
+                    <td>
+                        <span>{{ item['cantidad'] }}</span>
+                    </td>
                     <td>${{ item['precio'] }}</td>
+                    <td class="product-total">${{ item['precio'] * item['cantidad'] }}</td>
+                    <td>
+                        <button class="btn-delete">Eliminar</button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        
 
         <!-- Total -->
         <div class="carrito-total">
-            <span><strong>Total: </strong>${{ total }}</span>
+            <span><strong>Total a abonar: </strong>${{ total }}</span>
         </div>
-
-        <form action="{{ url_for('pagar') }}" method="POST">
-            <label for="pago">Selecciona un método de pago:</label><br>
-            <input type="radio" name="pago" value="mercado_pago" id="mercado_pago" required>
-            <label for="mercado_pago">Mercado Pago</label><br>
-            <input type="radio" name="pago" value="tarjeta" id="tarjeta" required>
-            <label for="tarjeta">Tarjeta de Crédito/Débito</label><br>
-            <button type="submit" class="btn-pagar">Proceder a pago</button>
-        </form>
     </div>
+
+    
 </div>
+<br>
+<hr>
+<br>
+            <div class="container-buttons">
+                <!-- Botón de Seguir Comprando -->
+                <div class="seguir-comprando">
+                    <a href="{{ url_for('index') }}" >Seguir Comprando</a>
+                </div>
+
+                <!-- Botón para proceder al pago (Redirigir al checkout) -->
+                <div class="btn-pagar">
+                    <a href="{{ url_for('checkout') }}" >Proceder al pago</a>
+                </div>
+            </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Funcionalidad para eliminar producto
+        const btnDeleteList = document.querySelectorAll('.btn-delete');
+        btnDeleteList.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const productRow = event.target.closest('tr');
+                const productId = productRow.dataset.productId;
+                productRow.remove();
+                removeProductFromCart(productId);
+                updateTotal();
+            });
+        });
+
+        // Actualizar el total
+        function updateTotal() {
+            let total = 0;
+            const productItems = document.querySelectorAll('.product-item');
+            productItems.forEach(item => {
+                const price = parseFloat(item.querySelector('td:nth-child(5)').textContent.replace('$', ''));
+                const quantity = parseInt(item.querySelector('td:nth-child(4) span').textContent, 10);
+                const productTotal = price * quantity;
+                item.querySelector('.product-total').textContent = `$${productTotal.toFixed(2)}`;
+                total += productTotal;
+            });
+            document.querySelector('.carrito-total span').textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        // Eliminar producto del carrito en el backend
+        function removeProductFromCart(productId) {
+            fetch(`/remove_product/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId })
+            });
+        }
+    });
+</script>
 {% endblock %}

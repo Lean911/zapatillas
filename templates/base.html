@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
     <title>Almacen de Calzado</title>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database.js"></script>
 </head>
 <body>
     <!-- Banner de cuenta regresiva -->
@@ -102,10 +104,12 @@
 <!-- Este es el código común para todas las páginas de productos -->
 
 <hr>
-<div class="container mt-4">
+<section>
     {% block content %}
     {% endblock %}
-</div>
+</section>
+
+
 
 
 
@@ -184,6 +188,16 @@
             const fechaLimite = new Date('2024-12-31T23:59:59').getTime();
             iniciarCuentaRegresiva(fechaLimite);
 
+         // Configuración de Firebase
+         const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_AUTH_DOMAIN",
+            databaseURL: "TU_DATABASE_URL",
+            projectId: "TU_PROJECT_ID",
+        };
+        // Inicializar Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
         
     </script>
 </body>

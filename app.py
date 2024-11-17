@@ -38,7 +38,7 @@ app.secret_key = secrets.token_hex(16)  # Genera una clave secreta única
 # Configura las opciones de la solicitud
 request_options = RequestOptions(access_token='MERCADO_PAGO_ACCESS_TOKEN')
 
-@app.route('/pagar', methods=['POST'])
+@app.route('/pagar', methods=['GET','POST'])
 def pagar():
     if 'carrito' not in session or len(session['carrito']) == 0:
         flash("El carrito está vacío.", "error")
@@ -85,7 +85,7 @@ def pagar():
             print(f"Error al procesar el pago: {e}")
             flash(f"Ocurrió un error al procesar el pago: {e}", "error")
             
-        
+
         return redirect(url_for('ver_carrito'))
 
     flash("Método de pago no válido.", "error")
@@ -122,55 +122,97 @@ def ver_carrito():
 
     return render_template('carrito.html', carrito=carrito, total=total)
 
+@app.route('/update_cart', methods=['POST'])
+def update_cart():
+    cart_data = request.json['cartData']
+    # Actualiza las cantidades del carrito en la sesión
+    session['carrito'] = cart_data
+    return jsonify({"message": "Carrito actualizado"}), 200
+
+@app.route('/remove_product/<int:product_id>', methods=['POST'])
+def remove_product(product_id):
+    # Elimina el producto del carrito en la sesión
+    carrito = session.get('carrito', [])
+    carrito = [item for item in carrito if item['id'] != product_id]
+    session['carrito'] = carrito
+    return jsonify({"message": "Producto eliminado"}), 200
 
 
-@app.route('/checkout', methods=['[GET]','POST'])
+@app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     carrito = session.get('carrito', [])
     if not carrito:
+        flash("Tu carrito está vacío. Añade productos antes de continuar.", "error")
+        return redirect(url_for('index'))  # Si el carrito está vacío, redirige al index
+
+    # Calcular el total del carrito
+    total = sum(float(item['precio']) * int(item['cantidad']) for item in carrito)
+
+    if request.method == 'POST':
+        metodo_pago = request.form.get('pago')
+        if not metodo_pago:
+            flash("Por favor, selecciona un método de pago.", "error")
+            return redirect(url_for('checkout'))
+        
+        # Guarda el método de pago en la sesión para usarlo después
+        session['metodo_pago'] = metodo_pago
+
+        # Redirige a la ruta para procesar el pago
+        return redirect(url_for('procesar_pago'))
+
+    return render_template('checkout.html', carrito=carrito, total=total)
+
+@app.route('/procesar_pago', methods=['GET'])
+def procesar_pago():
+    metodo_pago = session.get('metodo_pago')
+    carrito = session.get('carrito', [])
+    if not carrito:
+        flash("Tu carrito está vacío. Añade productos antes de continuar.", "error")
         return redirect(url_for('index'))
 
-    preference_data = {
-        "item": []
-    }
+    if metodo_pago == 'mercado_pago':
+        # Preparamos los datos para la preferencia de pago
+        preference_data = {
+            "items": [
+                {
+                    "title": item['nombre'],
+                    "quantity": int(item['cantidad']),
+                    "unit_price": float(item['precio']),
+                    "currency_id": "ARS"
+                } for item in carrito
+            ],
+            "back_urls": {
+                "success": url_for('pago_exitoso', _external=True),
+                "failure": url_for('pago_fallido', _external=True),
+                "pending": url_for('pago_pendiente', _external=True)
+            },
+            "auto_return": "approved"
+        }
 
-    # Conexión a la base de datos para obtener los detalles de los productos
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    for product in carrito:
-        product_id = product.get('id')
-
+        # Creación de la preferencia de pago
         try:
-            product_id = int(product_id)  # Asegurarse de que sea un número entero
-        except ValueError:
-            print(f"Error: product_id no es un número válido: {product_id}")
-            continue
+            preference_response = sdk.preference().create(preference_data)
+            if preference_response['status'] == 201:
+                link_pago = preference_response["response"]["init_point"]
+                return redirect(link_pago)
+            else:
+                flash("Error al crear la preferencia de pago.", "error")
+                return redirect(url_for('checkout'))
+        except Exception as e:
+            print(f"Error al procesar el pago: {e}")
+            flash("Error interno al procesar el pago.", "error")
+            return redirect(url_for('checkout'))
 
-        cursor.execute("SELECT nombre, precio FROM productos WHERE ID_Producto = %s", (product_id,))
-        product_data = cursor.fetchone()
+    elif metodo_pago == 'tarjeta':
+        # Aquí puedes implementar la lógica para manejar el pago con tarjeta
+        flash("Pago con tarjeta no implementado aún.", "info")
+        return redirect(url_for('checkout'))
 
-        if product_data:
-            item = {
-                "title": product_data['nombre'],
-                "quantity": 1,
-                "unit_price": float(product_data['precio'])
-            }
-            preference_data["item"].append(item)
-
-    cursor.close()
-    connection.close()
-
-    # Crea la preferencia de pago con las opciones de solicitud
-    preference_response = sdk.preference().create(preference_data)
-
-    if preference_response['status'] == 200:
-        preference = preference_response["response"]
-        link_pago = preference["init_point"]
-        return redirect(link_pago)
     else:
-        return "Error al crear la preferencia de pago", 500
-    
+        flash("Método de pago no válido.", "error")
+        return redirect(url_for('checkout'))
+
+
 
 
 @app.route('/eliminar_producto/<int:producto_id>', methods=['POST'])
