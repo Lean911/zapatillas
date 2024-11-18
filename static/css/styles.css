@@ -8,7 +8,7 @@
 /* Body */
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
+    background-color: #b6f3eb;
 }
 /* Navbar Principal */
 .navbar-main {
@@ -17,6 +17,11 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     font-size: 18px;
     z-index: 1000;
+    
+}
+
+.navbar-nav a{
+    color: gold;
 }
 
 .navbar-main .navbar-brand img {
@@ -581,7 +586,7 @@ padding-left: 20px;
 
 /* Estilos para el banner */
 .banner {
-    background-color: #ff4d4d;
+    background-color: #62e06c;
     color: white;
     text-align: center;
     padding: 10px;
@@ -601,7 +606,7 @@ padding-left: 20px;
     color: #ffd700;
 }
 .navbar-main {
-    margin-top: 50px; /* Ajusta según el alto del banner */
+    margin-top: 40px; /* Ajusta según el alto del banner */
 }
 
 
