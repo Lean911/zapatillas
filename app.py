@@ -482,7 +482,7 @@ def buscar():
 # Productos por categoría
 @app.route('/productos/<categoria>')
 def productos_categoria(categoria):
-    categorias_ids = {'hombre': 1, 'mujer': 2, 'nino': 3, 'niña': 4, 'temporada': 5}
+    categorias_ids = {'hombre': 1, 'mujer': 2, 'niño': 3, 'niña': 4, 'temporada': 5}
     id_categoria = categorias_ids.get(categoria.lower())
     
     if id_categoria:
