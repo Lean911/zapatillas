@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Enlazar Font Awesome para íconos -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
     <title>Dashboard - Admin</title>
 </head>
 <body>
@@ -19,8 +22,10 @@
     <!-- Main Container -->
     <main class="main-container">
         <div class="crud-header">
-            <h2>Opciones de Administración</h2>
+            <h2>Panel de control - Catálogo.</h2>
         </div>
+        <br>
+        <hr>
 
         <div class="crud-content">
             <!-- Form for adding products -->
@@ -68,10 +73,12 @@
                 <button type="submit" class="btn-agregar">Agregar Producto</button>
             </form>
         </div>
-
+<br>
+<hr>
+<br>
         <!-- Products Table -->
         <div class="crud-table">
-            <h2>Productos Existentes</h2>
+            <h2>Productos - Catálogo</h2>
             <div class="tabla-productos">
                 <table>
                     <thead>
@@ -97,10 +104,24 @@
                                 <td>{{ producto.Talle }}</td>
                                 <td><img src="{{ producto.Imagen }}" alt="{{ producto.Nombre }}" width="50"></td>
                                 <td>
-    <button class="btn-editar">Editar</button>
+                                    <button 
+                                        class="btn-editar" 
+                                        data-id="{{ producto.ID_Producto }}" 
+                                        data-nombre="{{ producto.Nombre|e }}" 
+                                        data-descripcion="{{ producto.Descripcion|e }}" 
+                                        data-precio="{{ producto.Precio }}" 
+                                        data-stock="{{ producto.Stock }}" 
+                                        data-categoria="{{ producto.ID_Categoria }}" 
+                                        data-talle="{{ producto.Talle|e }}" 
+                                        data-imagen="{{ producto.Imagen|e }}"
+                                        onclick="openEditPopup(this)">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+
+                                    
     <!-- Suponiendo que 'producto.id' es el identificador del producto -->
     <form action="{{ url_for('eliminar_producto_dashboard', producto_id=producto['ID_Producto']) }}" method="POST">
-        <button type="submit" class="btn-warning">Eliminar</button>
+        <button type="submit" class="btn-eliminar"><i class="fas fa-trash-alt"></i></button>
     </form>
 </td>
 
@@ -136,7 +157,49 @@
             <button onclick="window.location.href='{{ logout_url }}'" class="btn btn-danger">
                 Cerrar Sesión
             </button>
-        </div>        
+        </div>    
+        
+        
+        <!-- Popup de edición -->
+<div id="edit-popup" class="popup-overlay">
+    <div class="popup-content">
+        <button class="close-btn" onclick="closePopup()">×</button>
+        <h2>Editar Producto</h2>
+        <form id="edit-product-form" action="{{ url_for('editar_producto') }}" method="POST">
+            <input type="hidden" name="id_producto" id="edit-id">
+            <label for="edit-nombre">Nombre:</label>
+            <input type="text" name="nombre" id="edit-nombre" required>
+
+            <label for="edit-descripcion">Descripción:</label>
+            <textarea name="descripcion" id="edit-descripcion" required></textarea>
+
+            <label for="edit-precio">Precio:</label>
+            <input type="number" step="0.01" name="precio" id="edit-precio" required>
+
+            <label for="edit-stock">Stock:</label>
+            <input type="number" name="stock" id="edit-stock" required>
+
+            <label for="edit-categoria">Categoría:</label>
+            <select name="ID_Categoria" id="edit-categoria" required>
+                <option value="" disabled selected>Selecciona la Categoría</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.ID_Categoria }}">{{ categoria.Nombre }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="edit-talle">Talle:</label>
+            <input type="text" name="talle" id="edit-talle" required>
+
+            <label for="edit-imagen">URL de la Imagen:</label>
+            <input type="text" name="imagen" id="edit-imagen" required>
+<br>
+            <button type="submit" class="btn-guardar">Guardar Cambios</button>
+        </form>
+    </div>
+</div>
+
+        
+
     </main>
 
     <hr>
@@ -169,6 +232,45 @@
             const categoryDropdown = document.querySelector('select[name="ID_Categoria"]');
             categoryDropdown.disabled = this.checked;
         });
+
+        
+ // Función para abrir el popup y cargar los datos del producto
+function openEditPopup(button) {
+    // Extraer los datos del botón de editar
+    const id = button.getAttribute('data-id');
+    const nombre = button.getAttribute('data-nombre');
+    const descripcion = button.getAttribute('data-descripcion');
+    const precio = button.getAttribute('data-precio');
+    const stock = button.getAttribute('data-stock');
+    const categoria = button.getAttribute('data-categoria');
+    const talle = button.getAttribute('data-talle');
+    const imagen = button.getAttribute('data-imagen');
+    
+    // Llenar los campos del formulario de edición con los datos del producto
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-nombre').value = nombre;
+    document.getElementById('edit-descripcion').value = descripcion;
+    document.getElementById('edit-precio').value = precio;
+    document.getElementById('edit-stock').value = stock;
+    document.getElementById('edit-categoria').value = categoria;
+    document.getElementById('edit-talle').value = talle;
+    document.getElementById('edit-imagen').value = imagen;
+
+    // Mostrar el popup
+    document.getElementById('edit-popup').style.display = 'flex';
+    document.body.classList.add('popup-active');
+}
+
+// Función para cerrar el popup
+function closePopup() {
+    document.getElementById('edit-popup').style.display = 'none';
+    document.body.classList.remove('popup-active');
+}
+
+</script>
+
+
+
     </script>
 </body>
 </html>

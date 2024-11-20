@@ -4,31 +4,29 @@
     <h1>Productos de Temporada</h1>
     <p>Encuentra los productos más recientes de temporada aquí.</p>
 
-    {% if temporada_productos %}
-        <p>{{ temporada_productos|length }} productos de temporada disponibles.</p>
-        <div class="container-cards">
-            {% for producto in temporada_productos %}
-                <div class="card">
-                    <!-- Contenedor de la imagen -->
-                    <div class="image_container">
-                        <img src="{{ producto.Imagen }}" alt="{{ producto.Nombre }}" class="image">
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ producto['Nombre'] }}</h5>
-                        <p class="card-text">Precio: ${{ producto['Precio'] }}</p>
-                        <p class="card-text">{{ producto['Descripcion'] }}</p>
-
-                        <!-- Botón de añadir al carrito -->
-                        <form action="{{ url_for('agregar_al_carrito', producto_id=producto['ID_Producto']) }}" method="post">
-                            <button type="submit" class="btn btn-primary">Comprar</button>
-                        </form>
-                    </div>
+    {% if productos_temporada %}
+    
+    <div class="container-cards">
+        {% for producto in productos_temporada %}
+            <div class="card">
+                <div class="image_container">
+                    <img src="{{ producto['Imagen'] }}" alt="{{ producto['Nombre'] }}" class="image">
                 </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>No hay productos de temporada disponibles en este momento.</p>
-    {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ producto['Nombre'] }}</h5>
+                    <p class="card-text">Precio: ${{ producto['Precio'] }}</p>
+                    <p class="card-text">{{ producto['Descripcion'] }}</p>
+                    <form action="{{ url_for('agregar_al_carrito', id=producto['ID_Producto']) }}" method="post">
+                        <button type="submit" class="btn btn-primary">Comprar</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No hay productos de temporada disponibles en este momento.</p>
+{% endif %}
+
 
 {% endblock %}
 

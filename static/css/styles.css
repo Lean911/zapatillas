@@ -4,6 +4,16 @@
     margin: 0;
     box-sizing: border-box;
 }
+.carousel {
+    position: relative;
+    z-index: 10;  /* Asegura que el carrusel no quede sobre el navbar */
+}
+@media (max-width: 768px) {
+    .carousel {
+        padding-top: 80px;  /* Ajusta este valor según la altura de tu navbar */
+    }
+}
+
 
 /* Body */
 body {
@@ -179,10 +189,25 @@ button[type="submit"] {
     cursor: pointer; /* Cambia el cursor a pointer */
     transition: background-color 0.3s ease; /* Efecto de transición */
 }
-
 button[type="submit"]:hover {
     background-color: #0056b3; /* Fondo azul oscuro al pasar el mouse */
 }
+
+.btn-editar {
+    background-color: #33ff00; /* Fondo azul */
+    color: white; /* Texto blanco */
+    border: none; /* Sin bordes */
+    padding: 10px 20px; /* Espaciado interno */
+    font-size: 1em; /* Tamaño del texto */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor a pointer */
+    transition: background-color 0.3s ease; /* Efecto de transición */
+}
+.btn-editar:hover {
+    background-color: #17b639; /* Fondo azul oscuro al pasar el mouse */
+}
+
+
 .checkout-products h2{
     text-align: center;
     color: #0056b3;
@@ -260,11 +285,7 @@ padding-left: 20px;
     .navbar-logo {
         display: none;
     }
-    .footer-logo {
-        display: inline-block;
-        text-align: center;
-        margin-top: 15px;
-    }
+
     .container-cards {
         flex-direction: column; /* Apilar las tarjetas verticalmente */
         align-items: center;
@@ -356,17 +377,90 @@ padding-left: 20px;
 }
 
 /* Product Table */
+.crud-table h2{
+    text-align: center;
+}
+
+.crud-header h2{
+    text-align: center;
+}
 .tabla-productos table {
     width: 100%;
     border-collapse: collapse;
+    display: flexbox;
+    margin-left: 20px;
 }
 
 .tabla-productos th,
 .tabla-productos td {
-    padding: 10px;
-    border: 1px solid #ccc;
-    text-align: left;
+    padding: 12px; /* Un poco más de espaciado dentro de las celdas */
+    border: 1px solid #ddd; /* Bordes más suaves */
+    text-align: center;
+    vertical-align: middle; /* Alineación vertical centrada */
+    background-color: #f9f9f9; /* Color de fondo claro para las celdas */
 }
+
+.tabla-productos th {
+    padding: 12px;
+    border: 1px solid #ddd;
+    background-color: #007bff; /* Fondo azul para las cabeceras */
+    color: white; /* Color del texto blanco */
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+/* Estilo para los botones de acción */
+.crud-table td .btn-editar, .crud-table td .btn-eliminar {
+    padding: 6px 12px; /* Hacer los botones más pequeños */
+    font-size: 14px; /* Reducir el tamaño de la fuente */
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px; /* Espacio entre los botones */
+}
+
+/* Estilo para el botón de editar */
+.btn-editar {
+    background-color: #007bff; /* Azul para el botón de editar */
+    color: white;
+}
+
+.btn-editar:hover {
+    background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+}
+
+/* Estilo para el botón de eliminar */
+.btn-eliminar {
+    background-color: #dc3545; /* Rojo para el botón de eliminar */
+    color: white;
+}
+
+.btn-eliminar:hover {
+    background-color: #c82333; /* Rojo más oscuro al pasar el ratón */
+}
+
+/* Alineación de los íconos dentro de los botones */
+.btn-editar i, .btn-eliminar i {
+    margin-right: 6px; /* Espacio entre el ícono y el texto */
+    font-size: 9px; /* Tamaño de los íconos */
+}
+
+/* Asegurarse de que los botones estén alineados horizontalmente */
+.crud-table td .btn-editar, .crud-table td .btn-eliminar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Eliminar el margen derecho en el último botón de la fila */
+.crud-table td .btn-eliminar:last-child {
+    margin-right: 0;
+}
+
+
 
 .tabla-productos th {
     background-color: #007bff;
@@ -515,6 +609,7 @@ padding-left: 20px;
     color: #27ae60;
 }
 
+
 /* Botón de carrito */
 .cart-button {
     display: flex;
@@ -579,10 +674,6 @@ padding-left: 20px;
     transition: background-color 0.3s ease;
 }
 
-.alert-danger .btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-}
 
 /* Estilos para el banner */
 .banner {
@@ -1152,8 +1243,194 @@ th {
     background-color: #f4f4f4;
 }
 
+.btn-eliminar {
+    background-color: #dc3545; /* Rojo para el botón de eliminar */
+    color: white;
+}
+
+/* Estilos para el popup */
+#edit-popup {
+    display: none; /* Inicialmente oculto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.popup-content label {
+    font-weight: bold;
+    margin-bottom: 5px; /* Un pequeño margen para las etiquetas */
+}
+
+.popup-content input,
+.popup-content textarea,
+.popup-content select {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    width: 100%;
+}
+.popup-content button.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.popup-content button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.popup-content button:hover {
+    background-color: #0056b3;
+}
+
+.tabla-productos td button {
+    margin-right: 10px; /* Espacio entre los botones */
+}
+
+.btn-editar {
+    background-color: #007bff; /* Color de fondo azul */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-editar:hover {
+    background-color: #0056b3; /* Color más oscuro al pasar el ratón */
+}
+
+.btn-eliminar {
+    background-color: red; /* Color de fondo rojo */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-eliminar:hover {
+    background-color: darkred; /* Color más oscuro al pasar el ratón */
+}
+
+
+
+
+/* Estilo para el botón de cierre */
+.close-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    color: #aaa;
+    cursor: pointer;
+    align-self: flex-end;
+}
+
+.close-btn:hover {
+    color: #555;
+}
 
 
 
 
 
+.pie-pagina{
+    width: 100%;
+    background-color: #0a1531c7;
+}
+.pie-pagina .grupo-1{
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 45px 0px;
+}
+.pie-pagina .grupo-1 .box figure{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pie-pagina .grupo-1 .box figure img{
+    width: 250px;
+}
+
+.pie-pagina .grupo-1 .box h2{
+    color: white;
+    margin-bottom: 25px;
+    font-size: 20px;
+
+}
+
+.pie-pagina .grupo-1 .box p{
+    color: #efefef;
+    margin-bottom: 10px;
+}
+
+.pie-pagina .grupo-1 .red-social a{
+    display: inline-block;
+    text-decoration: none;
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+    color: white;
+    margin-right: 10px;
+    background-color: #0d2033;
+    text-align: center;
+    transition: all 300ms ease;
+}
+.pie-pagina .grupo-1 .red-social a :hover{
+    color: aqua;
+}
+.pie-pagina .grupo-2{
+    background-color: #0a1a2a;
+    padding: 15px 10px;
+    text-align: center;
+    color: #ffffff;
+}
+.pie-pagina .grupo-2 small{
+    font-size: 15px;
+}
+@media screen and (max-width:800px){
+    .pie-pagina .grupo-1{
+        width: 90%;
+        max-width: 1200px;
+        grid-template-columns: repeat(1, 1fr);
+        padding: 35px 0px;
+    }
+}
+h1{
+    text-align: center;
+    
+}
+p{
+    text-align: center;
+}

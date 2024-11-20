@@ -9,6 +9,7 @@
     <title>Almacen de Calzado</title>
     <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database.js"></script>
+    <script src="https://kit.fontawesome.com/4cd0a3ac41.js" crossorigin="anonymous"></script>
 </head>
 <body>
     
@@ -37,7 +38,7 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Hombre') }}">Hombre</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Mujer') }}">Mujer</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Nino') }}">Niño</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Niño') }}">Niño</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Niña') }}">Niña</a></li>
                         </ul>
                     </li>
@@ -45,7 +46,7 @@
                         <a class="nav-link active" aria-current="page" href="{{url_for('index')}}">Temporada</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">Contacto</a>
+                        <a class="nav-link active" href="#">Quienres Somos?</a>
                     </li>
                 </ul>
                 
@@ -117,13 +118,55 @@
 
 <hr>
 
-    <!-- Footer con el logo en móviles -->
-    <footer class="text-center mt-4">
-        <div class="footer-logo">
-            <img src="/static/img/almacenDeCalzsado-nobg.png" alt="Logo Footer" class="img-fluid" height="80" width="153">
+
+
+
+    <footer class="pie-pagina">
+        <div class="grupo-1">
+            <div class="box">
+                <figure>
+                    <a href="#">
+                        <img src="/static/img/almacenDeCalzsado-nobg.png" alt="Almacen de calzado">
+                    </a>
+                </figure>
+            </div>
+            <div class="box">
+                <h2>Sobre Nosotros</h2>
+                <p>Almacen de calzado, conseguí aca tus calzados preferidos</p>
+                <p>Almacen de calzado, conseguí aca tus calzados preferidos</p>
+            </div>
+            <div class="box">
+                <h2>Siguenos en nuestras redes sociales</h2>
+                <div class="red-social">
+                    <a href="#" class="fa fa-facebook"></a>
+                    <a href="#" class="fa fa-instagram"></a>
+                    <a href="#" class="fa fa-x"></a>
+                </div>
+            </div>
         </div>
-        <p>© 2024 Almacen de Calzado - Todos los derechos reservados</p>
+        <div class="grupo-2">
+            <small>&copy; 2024 <b>Almacen de calzado</b> - Todos los derechos Reservados.</small>
+
+        </div>
+
     </footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         <div class="alert-container">

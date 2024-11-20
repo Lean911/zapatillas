@@ -294,7 +294,58 @@ def pago_pendiente():
 
 
 
+@app.route('/editar_producto', methods=['POST'])
+def editar_producto():
+    if not session.get('is_admin'):
+        flash('No tienes permisos para realizar esta acción.', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    # Obtener datos del formulario
+    product_id = request.form.get('ID_Producto')  # ID del producto
+    nombre = request.form.get('nombre')
+    descripcion = request.form.get('descripcion')
+    precio = request.form.get('precio')
+    stock = request.form.get('stock')
+    id_categoria = request.form.get('ID_Categoria')
+    talle = request.form.get('talle')
+    imagen = request.form.get('imagen')
+    
+    # Validación básica (opcional, pero útil para evitar datos incompletos)
+    if not all([product_id, nombre, descripcion, precio, stock, id_categoria, talle, imagen]):
+        flash('Todos los campos son obligatorios.', 'warning')
+        return redirect(url_for('dashboard'))
 
+    # Actualizar en la base de datos
+    try:
+        connection = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="almacen_calzado"
+        )
+        cursor = connection.cursor()
+
+        # Query para actualizar el producto
+        query = """
+            UPDATE productos
+            SET Nombre = %s, Descripcion = %s, Precio = %s, Stock = %s, ID_Categoria = %s, Talle = %s, Imagen = %s
+            WHERE ID_Producto = %s
+        """
+        cursor.execute(query, (nombre, descripcion, precio, stock, id_categoria, talle, imagen, product_id))
+
+        # Confirmar los cambios
+        connection.commit()
+
+        flash('Producto actualizado exitosamente.', 'success')
+    except mysql.connector.Error as err:
+        flash(f'Error al actualizar el producto: {err}', 'danger')
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+    return redirect(url_for('dashboard'))
 
 
 # Registro de usuarios
@@ -369,7 +420,7 @@ def dashboard():
         id_categoria = request.form['ID_Categoria'] if not request.form.get('esDeTemporada') else "5"
         id_marca = request.form['id_marca']
         imagen = request.form['imagen']
-        es_de_temporada = request.form.get('esDeTemporada') == 'on'
+        es_de_temporada = 1 if request.form.get('esDeTemporada') == 'on' else 0
         talle = request.form['talle']
         
         conn = get_db_connection()
@@ -401,6 +452,7 @@ def dashboard():
     SELECT productos.*, categorias.Nombre AS Categoria
     FROM productos
     JOIN categorias ON productos.ID_Categoria = categorias.ID_Categoria
+    WHERE productos.esDeTemporada = 1 OR productos.esDeTemporada = 0
     '''
     cursor.execute(query_productos)
     productos = cursor.fetchall()
@@ -430,7 +482,7 @@ def buscar():
 # Productos por categoría
 @app.route('/productos/<categoria>')
 def productos_categoria(categoria):
-    categorias_ids = {'hombre': 1, 'mujer': 2, 'niño': 3, 'niña': 4}
+    categorias_ids = {'hombre': 1, 'mujer': 2, 'nino': 3, 'niña': 4, 'temporada': 5}
     id_categoria = categorias_ids.get(categoria.lower())
     
     if id_categoria:
@@ -461,7 +513,7 @@ def index():
 
     return render_template('index.html', productos_temporada=productos_temporada, productos_otros=productos_otros)
 
-# Ruta para agregar productos al carrito
+
 # Ruta para agregar productos al carrito
 @app.route('/agregar_al_carrito/<int:id>', methods=['POST'])
 def agregar_al_carrito(id):
