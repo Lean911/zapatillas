@@ -726,7 +726,7 @@ html {
 
 /* Estilos para el banner */
 .banner {
-    background-color: #62e06c;
+    background-color: #04df16;
     color: white;
     text-align: center;
     padding: 10px;
@@ -813,7 +813,12 @@ html {
     max-width: 200px; /* Tamaño máximo */
     text-align: center;
 }
-
+.box h2{
+    text-align: center;
+}
+.box .red-social{
+    text-align: center;
+}
 /* Tarjetas de productos en pantallas pequeñas */
 @media (max-width: 768px) {
     .products-container {
