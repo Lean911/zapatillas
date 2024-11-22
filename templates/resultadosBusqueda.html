@@ -1,13 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}
-Hombre | Almacén de Calzado
-{% endblock %}
-
 {% block content %}
-<h1>Calzados - Hombre</h1>
-
-<p>Encuentra los mejores productos aquí.</p>
+<h1>Calzados - {{ categoria_titulo }}</h1>
 
 <div class="container-cards">
     {% if productos %}
@@ -44,9 +38,10 @@ Hombre | Almacén de Calzado
                 </form>
             </div>
         </div>
-        {% endfor %}
+{% endfor %}
+
     {% else %}
-        <p>No hay productos disponibles en esta categoría.</p>
+        <p>No se encontraron productos.</p>
     {% endif %}
 </div>
 

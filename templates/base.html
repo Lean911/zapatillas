@@ -38,7 +38,7 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Hombre') }}">Hombre</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Mujer') }}">Mujer</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Nino') }}">Niño</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Niño') }}">Niño</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('productos_categoria', categoria='Niña') }}">Niña</a></li>
                         </ul>
                     </li>
@@ -46,7 +46,7 @@
                         <a class="nav-link active" aria-current="page" href="{{url_for('index')}}">Temporada</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">Quienres Somos?</a>
+                        <a class="nav-link active" href="#quienes-somos">Nuestra visión</a>
                     </li>
                 </ul>
                 
@@ -76,10 +76,11 @@
                         </a>
                     {% endif %}
                 </div>
-                <form class="d-flex mt-2 mt-lg-0 ms-lg-2" role="search" method="GET">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>                
+                <form action="{{ url_for('buscar') }}" method="GET">
+                    <input type="text" name="query" placeholder="Buscar producto..." value="{{ request.args.get('query', '') }}">
+                    <button type="submit">Buscar</button>
+                </form>
+                                
             </div>
         </div>
     </nav>
@@ -112,7 +113,32 @@
     {% endblock %}
 </section>
 
+<br>
+<hr>
+<br>
 
+<section id="quienes-somos" class="seccion-quienes-somos">
+    <div class="container">
+        <div class="row">
+            <!-- Columna izquierda con la imagen -->
+            <div class="columna-izquierda">
+                <img src="/static/img/imagen-zapatos.jpg" alt="Imagen de Quiénes Somos" class="imagen-quienes-somos">
+            </div>
+            <!-- Columna derecha con el contenido -->
+            <div class="columna-derecha">
+                <h2 class="titulo">Quiénes Somos</h2>
+                <h3 class="subtitulo">Nuestra Misión</h3>
+                <div class="texto-encajonado">
+                    <p>
+                        Somos una empresa comprometida con ofrecer los mejores productos para nuestros clientes.
+                        Nuestra pasión por la calidad y la excelencia nos impulsa a innovar constantemente en el mercado del calzado.
+                        Creemos en la satisfacción del cliente como el eje principal de nuestro trabajo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 
 
@@ -121,35 +147,42 @@
 
 
 
-    <footer class="pie-pagina">
-        <div class="grupo-1">
-            <div class="box">
-                <figure>
-                    <a href="#">
-                        <img src="/static/img/almacenDeCalzsado-nobg.png" alt="Almacen de calzado">
-                    </a>
-                </figure>
-            </div>
-            <div class="box">
-                <h2>Sobre Nosotros</h2>
-                <p>Almacen de calzado, conseguí aca tus calzados preferidos</p>
-                <p>Almacen de calzado, conseguí aca tus calzados preferidos</p>
-            </div>
-            <div class="box">
-                <h2>Siguenos en nuestras redes sociales</h2>
-                <div class="red-social">
-                    <a href="#" class="fa fa-facebook"></a>
-                    <a href="#" class="fa fa-instagram"></a>
-                    <a href="#" class="fa fa-x"></a>
-                </div>
-            </div>
-        </div>
-        <div class="grupo-2">
-            <small>&copy; 2024 <b>Almacen de calzado</b> - Todos los derechos Reservados.</small>
-
+<footer class="pie-pagina">
+    <div class="grupo-1">
+        <!-- Imagen actual -->
+        <div class="box">
+            <figure>
+                <a href="#">
+                    <img src="/static/img/datos.png" alt="Nueva imagen">
+                </a>
+            </figure>
         </div>
 
-    </footer>
+        <!-- Sobre nosotros -->
+        <div class="box">
+            <h2>Sobre Nosotros</h2>
+            <p>Almacen de calzado, conseguí acá tus calzados preferidos</p>
+            <p>Almacen de calzado, conseguí acá tus calzados preferidos</p>
+        </div>
+
+        <!-- Redes sociales -->
+        <div class="box">
+            <h2>Síguenos en nuestras redes sociales</h2>
+            <div class="red-social">
+                <a href="https://www.facebook.com" class="fa fa-facebook"></a>
+                <a href="https://www.instagram.com" class="fa fa-instagram"></a>
+                <a href="https://www.x.com" class="fa fa-x"></a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Información de derechos reservados -->
+    <div class="grupo-2">
+        <small>&copy; 2024 <b>Almacen de calzado</b> - Todos los derechos Reservados.</small>
+    </div>
+</footer>
+
+
 
 
 
@@ -243,7 +276,16 @@
         // Inicializar Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
     </script>
 </body>
 </html>

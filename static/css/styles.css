@@ -207,10 +207,20 @@ button[type="submit"]:hover {
     background-color: #17b639; /* Fondo azul oscuro al pasar el mouse */
 }
 
+h1{
+    text-align: center;
+}
+p{
+    text-align: center;
+}
 
-.checkout-products h2{
+.checkout-products h2 .product-title{
     text-align: center;
     color: #0056b3;
+}
+
+.title span{
+    text-align: center;
 }
 
 .checkout-container div{
@@ -601,6 +611,10 @@ padding-left: 20px;
     margin-bottom: 10px;
     flex-grow: 1;
 }
+html {
+    scroll-behavior: smooth;
+}
+
 
 /* Precio */
 .price span {
@@ -617,29 +631,64 @@ padding-left: 20px;
     justify-content: center;
     background-color: #007bff;
     color: white;
-    padding: 10px 20px;
+    padding: 10px 25px; /* Incrementar padding para mejor tamaño */
     font-size: 16px;
-    border-radius: 5px;
+    font-weight: bold;
+    border-radius: 8px; /* Más redondeado */
     border: none;
-    transition: background-color 0.3s ease;
-    width: 100%;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Añadir sombra */
+    cursor: pointer;
+    width: auto; /* Ajustar al contenido */
+    max-width: 100%; /* Evitar desbordamientos */
+    margin-top: 10px; /* Separación del precio */
 }
+
 .cart-button:hover {
     background-color: #0056b3;
+    transform: scale(1.05); /* Efecto al pasar el mouse */
 }
-
 
 .cart-icon {
-    margin-right: 10px;
-    width: 20px;
-    height: 20px;
+    margin-right: 8px; /* Reducir espacio */
+    width: 24px; /* Tamaño más visible */
+    height: 24px;
 }
 
-
-.carrito-box h2{
-    text-align: center;
-    color: #0056b3;
+/* Contenedor del precio y botón */
+.price-button-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px; /* Espaciado general */
 }
+
+/* Estilo para el precio */
+.product-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px; /* Separación del botón */
+    text-align: center; /* Centrar texto */
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+    .cart-button {
+        padding: 8px 20px; /* Reducir padding en pantallas pequeñas */
+        font-size: 14px; /* Ajustar tamaño de texto */
+    }
+
+    .cart-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .product-price {
+        font-size: 16px;
+    }
+}
+
 
 /* Contenedor de mensajes */
 .alert-container {
@@ -699,6 +748,89 @@ padding-left: 20px;
 .navbar-main {
     margin-top: 40px; /* Ajusta según el alto del banner */
 }
+
+
+/* Contenedor general de productos */
+.products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ajusta el número de columnas */
+    gap: 20px;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 1200px; /* Limita el ancho máximo */
+}
+
+/* Contenedor de tarjetas */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 300px; /* Tamaño máximo */
+    min-height: 400px; /* Asegurar altura mínima */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    text-align: center; /* Alinea el contenido al centro */
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Imagen del producto */
+.product-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px; /* Mayor separación entre imagen y texto */
+}
+
+/* Precio y botón en un bloque separado */
+.product-footer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    gap: 10px; /* Espaciado uniforme */
+}
+
+/* Ajustar el precio */
+.product-footer .product-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+/* Botón del carrito */
+.product-footer .cart-button {
+    width: 100%; /* Ocupa todo el ancho disponible */
+    max-width: 200px; /* Tamaño máximo */
+    text-align: center;
+}
+
+/* Tarjetas de productos en pantallas pequeñas */
+@media (max-width: 768px) {
+    .products-container {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* 2 columnas para pantallas pequeñas */
+    }
+
+    .product-card {
+        max-width: 100%;
+        min-height: auto; /* Permitir que crezcan dinámicamente */
+    }
+
+    .product-footer .cart-button {
+        font-size: 14px; /* Reducir tamaño del botón */
+        padding: 8px 15px;
+    }
+}
+
 
 
 
@@ -1368,7 +1500,7 @@ th {
     max-width: 1200px;
     margin: auto;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr); /* Tres columnas por defecto */
     padding: 45px 0px;
 }
 .pie-pagina .grupo-1 .box figure{
@@ -1381,13 +1513,16 @@ th {
 
 .pie-pagina .grupo-1 .box figure img{
     width: 250px;
+    max-width: 100%; /* Asegura que la imagen sea responsiva */
+    height: auto; /* Mantiene la proporción de la imagen */
+    display: block;
+    margin: 0 auto;
 }
 
 .pie-pagina .grupo-1 .box h2{
     color: white;
     margin-bottom: 25px;
     font-size: 20px;
-
 }
 
 .pie-pagina .grupo-1 .box p{
@@ -1407,7 +1542,7 @@ th {
     text-align: center;
     transition: all 300ms ease;
 }
-.pie-pagina .grupo-1 .red-social a :hover{
+.pie-pagina .grupo-1 .red-social a:hover{
     color: aqua;
 }
 .pie-pagina .grupo-2{
@@ -1419,18 +1554,115 @@ th {
 .pie-pagina .grupo-2 small{
     font-size: 15px;
 }
-@media screen and (max-width:800px){
+@media screen and (max-width: 800px){
     .pie-pagina .grupo-1{
         width: 90%;
         max-width: 1200px;
-        grid-template-columns: repeat(1, 1fr);
+        grid-template-columns: repeat(1, 1fr); /* En pantallas pequeñas, las columnas se apilan */
         padding: 35px 0px;
     }
+    .pie-pagina .grupo-1 .box figure img{
+        width: 150px; /* Tamaño ajustado en pantallas pequeñas */
+    }
 }
-h1{
-    text-align: center;
-    
+
+
+
+/* Estilos generales para la sección de 'Quiénes Somos' */
+.seccion-quienes-somos {
+    padding: 50px 20px;
+    background-color: #f9f9f9;
 }
-p{
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Estructura de dos columnas en pantallas grandes */
+.row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* Columna izquierda para la imagen */
+.columna-izquierda {
+    flex: 1;
+    max-width: 50%; /* Ocupa el 50% del ancho */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.imagen-quienes-somos {
+    max-width: 100%;
+    height: auto; /* Mantén la proporción de la imagen */
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Columna derecha para el contenido */
+.columna-derecha {
+    flex: 1;
+    max-width: 50%; /* Ocupa el 50% del ancho */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.titulo {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
     text-align: center;
+}
+
+.subtitulo {
+    font-size: 1.5rem;
+    font-weight: semi-bold;
+    margin-bottom: 15px;
+    color: #666;
+    text-align: center;
+}
+
+.texto-encajonado {
+    padding: 20px;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    color: #444;
+    font-size: 1rem;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* Ajustes responsivos para pantallas pequeñas */
+@media screen and (max-width: 768px) {
+    .row {
+        flex-direction: column; /* Cambia a disposición vertical */
+    }
+
+    .columna-izquierda,
+    .columna-derecha {
+        max-width: 100%; /* Ocupa el 100% del ancho */
+        flex: none;
+    }
+
+    .columna-izquierda {
+        margin-bottom: 20px; /* Agrega espacio entre imagen y texto */
+    }
+
+    .titulo,
+    .subtitulo {
+        text-align: center; /* Asegura centrado en pantallas pequeñas */
+    }
 }

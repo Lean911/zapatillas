@@ -12,7 +12,9 @@ import mercadopago
 
 
 
+
 app = Flask(__name__)
+
 app.config.from_object(config)
 sdk = mercadopago.SDK(app.config['MERCADO_PAGO_ACCESS_TOKEN'])
 
@@ -466,18 +468,6 @@ def dashboard():
     conn.close()
     return render_template('dashboard.html', productos=productos, categorias=categorias, marcas=marcas)
 
-# Buscar productos
-@app.route('/buscar', methods=['GET'])
-def buscar():
-    termino_busqueda = request.args.get('search', '')
-    conexion = get_db_connection()
-    cursor = conexion.cursor()
-    consulta = "SELECT * FROM productos WHERE nombre_producto LIKE %s"
-    cursor.execute(consulta, (f"%{termino_busqueda}%",))
-    resultados = cursor.fetchall()
-    cursor.close()
-    conexion.close()
-    return render_template('resultados.html', resultados=resultados)
 
 # Productos por categoría
 @app.route('/productos/<categoria>')
@@ -512,6 +502,60 @@ def index():
     conn.close()
 
     return render_template('index.html', productos_temporada=productos_temporada, productos_otros=productos_otros)
+
+
+@app.route('/buscar', methods=['GET'])
+def buscar():
+    query = request.args.get('query', '').strip()
+    categoria = request.args.get('categoria', '').strip()
+    
+    categoria_id = int(categoria) if categoria.isdigit() else None
+    categorias = []
+
+    try:
+        conexion = get_db_connection()
+        cursor = conexion.cursor(dictionary=True)
+        
+        # Obtener todas las categorías
+        cursor.execute("SELECT ID_Categoria, Nombre FROM categorias")
+        categorias = cursor.fetchall()
+
+        # Consulta SQL ajustada
+        query_sql = """
+            SELECT p.*
+            FROM productos p
+            LEFT JOIN categorias c ON p.ID_Categoria = c.ID_Categoria
+            WHERE p.Nombre LIKE %s OR p.Descripcion LIKE %s
+        """
+        
+        # Si se incluye categoría, añade el filtro
+        if categoria_id:
+            query_sql += " AND c.ID_Categoria = %s"
+            cursor.execute(query_sql, ('%' + query + '%', '%' + query + '%', categoria_id))
+        else:
+            cursor.execute(query_sql, ('%' + query + '%', '%' + query + '%'))
+        
+        productos = cursor.fetchall()
+
+        cursor.close()
+        conexion.close()
+
+        if not productos:
+            flash(f"No se encontraron productos para '{query}'", "info")
+
+        categoria_titulo = query.capitalize() if not categoria_id else f"{query.capitalize()} - Categoría: {categoria}"
+
+        return render_template(
+            'resultadosBusqueda.html', 
+            productos=productos, 
+            query=query, 
+            categoria_titulo=categoria_titulo, 
+            categorias=categorias
+        )
+    
+    except Exception as e:
+        flash(f"Error al realizar la búsqueda: {str(e)}", "danger")
+        return render_template('resultadosBusqueda.html', productos=[], query=query, categorias=categorias)
 
 
 # Ruta para agregar productos al carrito
@@ -564,6 +608,8 @@ def logout():
     session.clear()
     flash('Has cerrado sesión correctamente.')
     return redirect(url_for('index'))
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
